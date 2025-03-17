@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All Users</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 15px;
+      text-align: center;
+    }
+    .profile {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      color: #fff;
+      overflow: hidden;
+    }
+    .profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .user-name {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .user-college, .user-major, .user-email {
+      font-size: 0.9em;
+      color: #555;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>All Users</h1>
+  <div class="cards-container" id="cardsContainer"></div>
+  
+  <script>
+    // Utility: Generate a random hex color
+    function getRandomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+    
+    // Utility: Get initials from first and last name
+    function getInitials(first, last) {
+      let initials = "";
+      if (first && first.length > 0) initials += first[0].toUpperCase();
+      if (last && last.length > 0) initials += last[0].toUpperCase();
+      return initials;
+    }
+    
+    // Fetch user data from the API
+    fetch("https://sheet2api.com/v1/rkmbUqHQAC3C/submission-form-responses")
+      .then(response => response.json())
+      .then(data => {
+        // Use a Map to ensure each user (by "User ID") appears only once
+        const usersMap = new Map();
+        data.forEach(item => {
+          const userId = item["User ID"];
+          if (!usersMap.has(userId)) {
+            const user = {
+              userId: userId,
+              firstName: item["First Name"] || "",
+              lastName: item["Last Name"] || "",
+              email: item.Email || "",
+              college: item["College or University Name"] || "",
+              major: item.Major || "",
+              profilePicture: item["Profile Picture"] || ""
+            };
+            usersMap.set(userId, user);
+          }
+        });
+        
+        // Convert Map values to an array
+        const uniqueUsers = Array.from(usersMap.values());
+        const container = document.getElementById("cardsContainer");
+        
+        // Create a card for each unique user
+        uniqueUsers.forEach(user => {
+          const card = document.createElement("div");
+          card.className = "card";
+          
+          // Profile Picture or Generated Avatar
+          const profileDiv = document.createElement("div");
+          profileDiv.className = "profile";
+          if (user.profilePicture) {
+            const img = document.createElement("img");
+            img.src = user.profilePicture;
+            img.alt = user.firstName + " " + user.lastName;
+            profileDiv.appendChild(img);
+          } else {
+            profileDiv.style.backgroundColor = getRandomColor();
+            profileDiv.textContent = getInitials(user.firstName, user.lastName);
+          }
+          card.appendChild(profileDiv);
+          
+          // User Name
+          const userName = document.createElement("div");
+          userName.className = "user-name";
+          userName.textContent = user.firstName + " " + user.lastName;
+          card.appendChild(userName);
+          
+          // College/University
+          const userCollege = document.createElement("div");
+          userCollege.className = "user-college";
+          userCollege.textContent = user.college;
+          card.appendChild(userCollege);
+          
+          // Major
+          const userMajor = document.createElement("div");
+          userMajor.className = "user-major";
+          userMajor.textContent = user.major;
+          card.appendChild(userMajor);
+          
+          // Email
+          const userEmail = document.createElement("div");
+          userEmail.className = "user-email";
+          userEmail.textContent = user.email;
+          card.appendChild(userEmail);
+          
+          container.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching user data:", error);
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Discovery Platform</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    /* Search */
+    .search-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .search-container input[type="text"] {
+      width: 90%;
+      max-width: 500px;
+      padding: 12px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    /* Categories & Projects */
+    #categoriesContainer {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .category-header {
+      font-size: 1.5em;
+      margin: 20px 0 10px;
+      padding-left: 10px;
+      border-left: 4px solid #0066cc;
+      color: #333;
+    }
+    .category-projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    /* Project Card */
+    .project-card {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 15px;
+      transition: transform 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+    .project-card:hover {
+      transform: translateY(-5px);
+    }
+    /* Logo placeholder as div */
+    .project-logo {
+      width: 60px;
+      height: 60px;
+      background: #007acc;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .project-title {
+      font-size: 1.2em;
+      margin-bottom: 5px;
+    }
+    .project-description {
+      font-size: 0.95em;
+      margin-bottom: 10px;
+    }
+    /* Event Today Badge on Card */
+    .event-today {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ff0;
+      color: #000;
+      padding: 3px 6px;
+      font-size: 0.8em;
+      border-radius: 3px;
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 5px;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: red;
+    }
+    /* Events Modal Content */
+    .event-item {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    .today-badge {
+      background: #ff0;
+      color: #000;
+      padding: 2px 6px;
+      font-size: 0.8em;
+      border-radius: 3px;
+      margin-left: 10px;
+    }
+    /* Button Styles */
+    button {
+      padding: 8px 12px;
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Project Discovery Platform</h1>
+  
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search projects...">
+  </div>
+  
+  <!-- Container for Categories and Projects -->
+  <div id="categoriesContainer"></div>
+  
+  <!-- Main Project Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="modalClose">&times;</span>
+      <div id="modalHeader"></div>
+      <p id="modalDescription"></p>
+      <div id="modalProjectInfo"></div>
+    </div>
+  </div>
+  
+  <!-- Events Modal -->
+  <div id="eventsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="eventsModalClose">&times;</span>
+      <h3>Upcoming Events</h3>
+      <div id="eventsList"></div>
+    </div>
+  </div>
+  
+  <script>
+    // Categories as defined originally
+    const categories = [
+      "Clubs & Orgs",
+      "Businesses & Startups",
+      "Research & Product Development"
+    ];
+    
+    let projects = [];
+    
+    const participantRanges = ["1-10 members", "11-50 members", "51-100 members", "101-250 members", "251-500 members"];
+    
+    // Mock events to be added to every project (using fixed dates)
+    const mockEvents = [
+      {
+        title: "Monthly Meetup",
+        date: "2025-03-08T18:00:00", // adjust this date as needed to test 'Today'
+        description: "Join us for our monthly meetup."
+      },
+      {
+        title: "Workshop: New Technologies",
+        date: "2025-03-10T14:00:00",
+        description: "A workshop discussing the latest in tech."
+      }
+    ];
+    
+    // Function to display skeleton loaders (omitted for brevity; assume it's similar to the original)
+    function showSkeletonLoaders() {
+      const container = document.getElementById('categoriesContainer');
+      container.innerHTML = "";
+      categories.forEach(category => {
+        const sectionHeader = document.createElement('h2');
+        sectionHeader.className = "category-header";
+        sectionHeader.style.backgroundColor = "#ddd";
+        sectionHeader.style.height = "24px";
+        sectionHeader.style.width = "200px";
+        container.appendChild(sectionHeader);
+        
+        const grid = document.createElement('div');
+        grid.className = "category-projects";
+        for (let i = 0; i < 4; i++) {
+          const skeletonCard = document.createElement('div');
+          skeletonCard.className = "project-card";
+          skeletonCard.style.backgroundColor = "#eee";
+          skeletonCard.style.height = "150px";
+          grid.appendChild(skeletonCard);
+        }
+        container.appendChild(grid);
+      });
+    }
+    
+    // Show skeleton loaders immediately
+    showSkeletonLoaders();
+    
+    // Fetch project data from the API and add mock events to every project
+    fetch("https://sheet2api.com/v1/rhBSJNTTYKgC/fake-data")
+      .then(response => response.json())
+      .then(data => {
+        projects = data.map(item => ({
+          title: item["Project Title"],
+          description: item["Tagline"],
+          modalDescription: item["Description"],
+          category: item["Project Type"],
+          logo: item["Logo URL"],
+          demoLink: item["Demo Link"],
+          contactEmail: item["Project Contact Email"],
+          participants: item["Number of participants"],
+          school: item["College or University Name"],
+          tags: item["Industry"] ? item["Industry"].split(",").map(s => s.trim()) : [],
+          instagram: item["Instagram"],
+          linkedIn: item["LinkedIn"],
+          youtube: item["YouTube"],
+          tiktok: item["TikTok"],
+          github: item["GitHub"],
+          // Add the same mock events to every project
+          events: mockEvents
+        }));
+        renderCategories();
+      })
+      .catch(error => {
+        console.error("Error fetching project data:", error);
+      });
+    
+    // Render projects in their respective categories
+    function renderCategories(filter = "") {
+      const container = document.getElementById('categoriesContainer');
+      container.innerHTML = "";
+      const today = new Date().toLocaleDateString();
+    
+      categories.forEach(category => {
+        let catProjects = projects.filter(p => p.category === category);
+    
+        if (filter.trim() !== "") {
+          catProjects = catProjects.filter(p =>
+            p.title.toLowerCase().includes(filter.toLowerCase()) ||
+            p.description.toLowerCase().includes(filter.toLowerCase()) ||
+            p.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
+          );
+        }
+    
+        if (catProjects.length > 0) {
+          const sectionHeader = document.createElement('h2');
+          sectionHeader.className = "category-header";
+          sectionHeader.textContent = category;
+          container.appendChild(sectionHeader);
+    
+          const grid = document.createElement('div');
+          grid.className = "category-projects";
+    
+          catProjects.slice(0, 4).forEach((project, idx) => {
+            const card = document.createElement('div');
+            card.className = "project-card";
+    
+            // Logo as a div placeholder
+            const logoDiv = document.createElement('div');
+            logoDiv.className = "project-logo";
+            // If logo URL exists, you could use an <img> tag; here we use text from the title's initials or similar
+            logoDiv.textContent = project.title.slice(0, 2).toUpperCase();
+            card.appendChild(logoDiv);
+    
+            const title = document.createElement('div');
+            title.className = "project-title";
+            title.textContent = project.title;
+            card.appendChild(title);
+    
+            const desc = document.createElement('div');
+            desc.className = "project-description";
+            desc.textContent = project.description;
+            card.appendChild(desc);
+    
+            // Check if any event is today; if so, add a badge on the card
+            if (project.events && project.events.some(ev => new Date(ev.date).toLocaleDateString() === today)) {
+              const badge = document.createElement('div');
+              badge.className = 'event-today';
+              badge.textContent = 'Event Today';
+              card.appendChild(badge);
+            }
+    
+            // Clicking card opens project modal with details
+            card.addEventListener('click', () => openModal(project, idx));
+    
+            grid.appendChild(card);
+          });
+          container.appendChild(grid);
+        }
+      });
+    }
+    
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      renderCategories(e.target.value);
+    });
+    
+    // Modal Elements and Event Listeners
+    const modal = document.getElementById('modal');
+    const modalHeader = document.getElementById('modalHeader');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalProjectInfo = document.getElementById('modalProjectInfo');
+    const modalClose = document.getElementById('modalClose');
+    
+    modalClose.addEventListener('click', () => {
+      modal.style.display = "none";
+    });
+    
+    window.addEventListener('click', (e) => {
+      if (e.target == modal) modal.style.display = "none";
+      if (e.target == eventsModal) eventsModal.style.display = "none";
+    });
+    
+    // Open the project modal with details and a "View Events" button
+    function openModal(project, idx) {
+      modalHeader.innerHTML = "";
+      modalProjectInfo.innerHTML = "";
+    
+      // Title and fake logo
+      const title = document.createElement('h2');
+      title.textContent = project.title;
+      modalHeader.appendChild(title);
+    
+      // Modal description
+      modalDescription.textContent = project.modalDescription || project.description;
+    
+      // Fake additional info
+      const extraInfo = document.createElement('p');
+      extraInfo.textContent = "Additional details about the club, contact info, and more.";
+      modalProjectInfo.appendChild(extraInfo);
+    
+      // "View Events" Button – opens the events modal with the project's events
+      const viewEventsBtn = document.createElement('button');
+      viewEventsBtn.textContent = "View Events";
+      viewEventsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openEventsModal(project.events);
+      });
+      modalProjectInfo.appendChild(viewEventsBtn);
+    
+      modal.style.display = "block";
+    }
+    
+    // Events Modal Elements and Functions
+    const eventsModal = document.getElementById('eventsModal');
+    const eventsModalClose = document.getElementById('eventsModalClose');
+    const eventsList = document.getElementById('eventsList');
+    
+    eventsModalClose.addEventListener('click', () => {
+      eventsModal.style.display = "none";
+    });
+    
+    // Open Events Modal and populate with events
+    function openEventsModal(events) {
+      eventsList.innerHTML = "";
+      const today = new Date().toLocaleDateString();
+      events.forEach(event => {
+        const eventItem = document.createElement('div');
+        eventItem.className = 'event-item';
+    
+        const eventTitle = document.createElement('h4');
+        eventTitle.textContent = event.title;
+        const eventDateObj = new Date(event.date);
+        const eventDateFormatted = eventDateObj.toLocaleDateString();
+        if (today === eventDateFormatted) {
+          const badge = document.createElement('span');
+          badge.className = 'today-badge';
+          badge.textContent = 'Today';
+          eventTitle.appendChild(badge);
+        }
+        eventItem.appendChild(eventTitle);
+    
+        const eventDateP = document.createElement('p');
+        eventDateP.textContent = "Date: " + eventDateFormatted;
+        eventItem.appendChild(eventDateP);
+    
+        const eventDesc = document.createElement('p');
+        eventDesc.textContent = event.description;
+        eventItem.appendChild(eventDesc);
+    
+        eventsList.appendChild(eventItem);
+      });
+      eventsModal.style.display = "block";
+    }
+  </script>
+</body>
+</html>

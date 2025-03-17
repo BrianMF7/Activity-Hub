@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Discovery Platform</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      line-height: 1.6;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Header */
+    header {
+      background: #0066cc;
+      color: #fff;
+      padding: 20px 0;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 5px;
+    }
+    header p {
+      font-size: 1.1em;
+    }
+
+    /* Search Section */
+    .search-container {
+      margin: 20px auto;
+      max-width: 800px;
+      text-align: center;
+      padding: 0 10px;
+    }
+    .search-container input[type="text"] {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px;
+      font-size: 1em;
+      background: #fff;
+      border: 1px solid #ccc;
+      color: #333;
+      border-radius: 4px;
+      transition: border-color 0.3s;
+    }
+    .search-container input[type="text"]:focus {
+      border-color: #0066cc;
+      outline: none;
+    }
+
+    /* Container for all categories */
+    #categoriesContainer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Category Section */
+    .category-header {
+      font-size: 1.5em;
+      margin: 20px 0 10px;
+      padding-left: 10px;
+      border-left: 4px solid #0066cc;
+      color: #333;
+    }
+    .category-projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    /* Project Card */
+    .project-card {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 15px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .project-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .project-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 10px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+    .project-header h3 {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 1.2em;
+      margin: 0;
+    }
+    .project-card p {
+      margin-bottom: 15px;
+      font-size: 0.95em;
+      color: #555;
+    }
+    .project-info {
+      font-size: 0.8em;
+      color: #555;
+      margin-top: 8px;
+    }
+    .tags {
+      margin-top: 10px;
+    }
+    .tag {
+      display: inline-block;
+      background: #eee;
+      color: #555;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 0.8em;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 5px;
+      position: relative;
+      color: #333;
+    }
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+    }
+    /* Visit Button */
+    .visit-button {
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
+
+    /* Modal Header: Project Title & Visit Button */
+    #modalHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #modalHeader .title-container {
+      display: flex;
+      align-items: center;
+    }
+    #modalHeader img.project-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 10px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+    #modalHeader h3 {
+      font-size: 1.5em;
+      margin: 0;
+    }
+
+    /* Modal Project Info: School, Contact, Participants, Tags */
+    #modalProjectInfo {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #555;
+    }
+    #modalProjectInfo .project-school,
+    #modalProjectInfo .project-participants {
+      margin-bottom: 5px;
+    }
+    #modalProjectInfo img.icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: middle;
+      filter: grayscale(100%) brightness(0.6);
+    }
+
+    /* Contact Email Section in Modal */
+    .project-contact {
+      margin-top: 8px;
+      font-size: 0.9em;
+      color: #555;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .project-contact img.contact-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      filter: grayscale(100%) brightness(0.6);
+    }
+    .project-contact button {
+      margin-right: 5px;
+      padding: 4px 8px;
+      font-size: 0.8em;
+      background: #eee;
+      color: #555;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .project-contact span.email-address {
+      font-weight: normal;
+      cursor: pointer;
+      font-size: 0.9em;
+      position: relative;
+      display: inline-block;
+    }
+    .copy-tooltip {
+      visibility: hidden;
+      opacity: 0;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 3px 6px;
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: opacity 0.3s;
+      font-size: 0.75em;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .email-address:hover .copy-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    #modalProjectInfo .tags {
+      margin-top: 5px;
+    }
+    /* Social Links Section */
+    .social-links {
+      margin-top: 10px;
+    }
+    .social-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 5px;
+      cursor: pointer;
+      /* We now use mask-based rendering to force the icon to a solid light gray color */
+      background-color: #aaa;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      display: inline-block;
+    }
+    .social-icon:hover {
+      opacity: 0.8;
+    }
+
+    /* Comments Section - Threaded UI */
+    #commentsSection {
+      margin-top: 20px;
+    }
+    #commentsSection h3 {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .comment-container {
+      margin-bottom: 15px;
+    }
+    .comment-item {
+      display: flex;
+      align-items: flex-start;
+      position: relative;
+    }
+    .pfp {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      margin-right: 10px;
+      flex-shrink: 0;
+      font-size: 1em;
+      background: #777;
+    }
+    .comment-content {
+      flex: 1;
+    }
+    .comment-content p {
+      margin-bottom: 5px;
+    }
+    .comment-actions {
+      margin-top: 5px;
+    }
+    .toggle-replies,
+    .reply-button {
+      background: none;
+      border: none;
+      color: #065fd4;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .replies-container {
+      margin-left: 50px;
+      padding-left: 20px;
+      position: relative;
+      display: none;
+      margin-top: 10px;
+    }
+    .replies-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 10px;
+      width: 2px;
+      background: #ddd;
+    }
+    .replies-container .comment-item {
+      margin-bottom: 10px;
+    }
+
+    /* New Comment Form */
+    #newCommentSection {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+    }
+    #newCommentForm {
+      display: flex;
+      align-items: center;
+    }
+    #newCommentForm input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      font-size: 0.95em;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      color: #333;
+      transition: border-color 0.3s;
+    }
+    #newCommentForm input[type="text"]:focus {
+      border-color: #0066cc;
+      outline: none;
+    }
+    #newCommentForm button {
+      margin-left: 10px;
+      padding: 8px 12px;
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+    #newCommentForm:focus-within button {
+      display: inline-block;
+    }
+
+    /* Reply Form Styles */
+    .reply-form {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .reply-form input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      font-size: 0.95em;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      color: #333;
+      transition: border-color 0.3s;
+    }
+    .reply-form input[type="text"]:focus {
+      border-color: #0066cc;
+      outline: none;
+    }
+    .reply-form button {
+      margin-left: 10px;
+      padding: 8px 12px;
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+    .reply-form:focus-within button {
+      display: inline-block;
+    }
+
+    /* Footer */
+    footer {
+      background: #333;
+      color: #fff;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: 40px;
+    }
+
+    /* Captcha Modal for Email Verification */
+    #captchaModal {
+      display: none;
+      position: fixed;
+      z-index: 1100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    #captchaModal .modal-content {
+      width: 300px;
+      margin: 20% auto;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #888;
+      border-radius: 5px;
+      text-align: center;
+      position: relative;
+      color: #333;
+    }
+    #captchaModal button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #captchaModal .close {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Custom No Demo Modal */
+    #noDemoModal {
+      display: none;
+      position: fixed;
+      z-index: 1100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    #noDemoModal .modal-content {
+      width: 300px;
+      margin: 20% auto;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #888;
+      border-radius: 5px;
+      text-align: center;
+      position: relative;
+      color: #333;
+    }
+    #noDemoModal button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #noDemoModal .close {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Social Link Modal */
+    #socialModal {
+      display: none;
+      position: fixed;
+      z-index: 1100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    #socialModal .modal-content {
+      width: 300px;
+      margin: 20% auto;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #888;
+      border-radius: 5px;
+      text-align: center;
+      position: relative;
+      color: #333;
+    }
+    #socialModal button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #socialModal .close {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Logo Modal for Big Logo View */
+    #logoModal {
+      display: none;
+      position: fixed;
+      z-index: 1100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    #logoModal .modal-content {
+      width: 80%;
+      max-width: 500px;
+      margin: 10% auto;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #888;
+      border-radius: 5px;
+      text-align: center;
+      position: relative;
+    }
+    #logoModal .modal-content img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    #logoModal .close {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* Skeleton Loading Styles */
+    .skeleton {
+      background-color: #ddd;
+      position: relative;
+      overflow: hidden;
+    }
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -150px;
+      width: 150px;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+      animation: loading 1.5s infinite;
+    }
+    @keyframes loading {
+      0% { left: -150px; }
+      100% { left: 100%; }
+    }
+
+    /* Skeleton Card Styles */
+    .skeleton-card {
+      background: #fff;
+      border-radius: 4px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .skeleton-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .skeleton-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      margin-right: 10px;
+    }
+    .skeleton-text {
+      flex: 1;
+      height: 16px;
+      border-radius: 4px;
+    }
+    .skeleton-line {
+      height: 14px;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Project Discovery Platform</h1>
+    <p>Discover innovative projects and connect with like-minded peers</p>
+  </header>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search projects...">
+  </div>
+
+  <!-- Container for categories and projects -->
+  <div id="categoriesContainer"></div>
+
+  <!-- Main Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <!-- Modal Header: includes project title, clickable logo, and Visit button -->
+      <div id="modalHeader"></div>
+      <p id="modalDescription"></p>
+      <!-- Modal Project Info (School, Contact, Participants, Tags) and Social Icons -->
+      <div id="modalProjectInfo"></div>
+      <div id="commentsSection">
+        <h3>Comments</h3>
+        <!-- New Comment Form (top-level) -->
+        <div id="newCommentSection">
+          <form id="newCommentForm">
+            <input type="text" id="newCommentInput" placeholder="Add a comment..." required>
+            <button type="submit" class="post-btn">Post</button>
+            <button type="button" class="cancel-btn" id="cancelNewComment">Cancel</button>
+          </form>
+        </div>
+        <div id="commentsContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Captcha Modal for Email Verification -->
+  <div id="captchaModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="captchaClose">&times;</span>
+      <h3>Please confirm you're not a robot</h3>
+      <p>Click the button below to verify.</p>
+      <button id="captchaConfirmBtn">Verifying...</button>
+    </div>
+  </div>
+
+  <!-- Custom No Demo Modal -->
+  <div id="noDemoModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="noDemoClose">&times;</span>
+      <h3>No Demo Available</h3>
+      <p>There is no demo link provided for this project.</p>
+      <button id="noDemoOkBtn">OK</button>
+    </div>
+  </div>
+
+  <!-- Social Link Modal -->
+  <div id="socialModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="socialModalClose">&times;</span>
+      <h3 id="socialModalTitle">Link Not Available</h3>
+      <p id="socialModalMessage">This social link is not available for this project.</p>
+      <button id="socialModalOkBtn">OK</button>
+    </div>
+  </div>
+
+  <!-- Logo Modal for Big Logo View -->
+  <div id="logoModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="logoModalClose">&times;</span>
+      <img id="logoModalImage" src="" alt="Large Logo" />
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 College Project Discovery Platform. All rights reserved.
+  </footer>
+
+  <script>
+    /* Categories */
+    const categories = [
+      "Clubs & Orgs",
+      "Businesses & Startups",
+      "Research & Product Development"
+    ];
+
+    /* Global projects variable to be populated from the API */
+    let projects = [];
+
+    /* Fallback participant ranges (if API field is missing) */
+    const participantRanges = ["1-10 members", "11-50 members", "51-100 members", "101-250 members", "251-500 members"];
+
+    /* Function to show skeleton loaders while data is fetching */
+    function showSkeletonLoaders() {
+      const container = document.getElementById('categoriesContainer');
+      container.innerHTML = "";
+      categories.forEach(category => {
+        // Skeleton Category Header
+        const sectionHeader = document.createElement('h2');
+        sectionHeader.className = "category-header skeleton";
+        sectionHeader.style.height = "24px";
+        sectionHeader.style.width = "200px";
+        container.appendChild(sectionHeader);
+
+        // Skeleton Grid Container
+        const grid = document.createElement('div');
+        grid.className = "category-projects";
+        for (let i = 0; i < 4; i++) {
+          const skeletonCard = document.createElement('div');
+          skeletonCard.className = "skeleton-card";
+
+          // Skeleton Header (Logo and Title)
+          const skeletonHeader = document.createElement('div');
+          skeletonHeader.className = "skeleton-header";
+          const skeletonLogo = document.createElement('div');
+          skeletonLogo.className = "skeleton skeleton-logo";
+          skeletonHeader.appendChild(skeletonLogo);
+          const skeletonTitle = document.createElement('div');
+          skeletonTitle.className = "skeleton skeleton-text";
+          skeletonHeader.appendChild(skeletonTitle);
+          skeletonCard.appendChild(skeletonHeader);
+
+          // Skeleton description lines
+          const skeletonDesc1 = document.createElement('div');
+          skeletonDesc1.className = "skeleton skeleton-line";
+          skeletonDesc1.style.width = "100%";
+          skeletonCard.appendChild(skeletonDesc1);
+          const skeletonDesc2 = document.createElement('div');
+          skeletonDesc2.className = "skeleton skeleton-line";
+          skeletonDesc2.style.width = "80%";
+          skeletonCard.appendChild(skeletonDesc2);
+
+          grid.appendChild(skeletonCard);
+        }
+        container.appendChild(grid);
+      });
+    }
+
+    // Show skeleton loaders immediately
+    showSkeletonLoaders();
+
+    /* Fetch project data from the API and map its fields to our model */
+    fetch("https://sheet2api.com/v1/rhBSJNTTYKgC/fake-data")
+      .then(response => response.json())
+      .then(data => {
+        projects = data.map(item => ({
+          title: item["Project Title"],
+          description: item["Tagline"],
+          modalDescription: item["Description"],
+          category: item["Project Type"],
+          logo: item["Logo URL"],
+          demoLink: item["Demo Link"], // For Visit button
+          contactEmail: item["Project Contact Email"],
+          participants: item["Number of participants"],
+          school: item["College or University Name"],
+          tags: item["Industry"] ? item["Industry"].split(",").map(s => s.trim()) : [],
+          instagram: item["Instagram"],
+          linkedIn: item["LinkedIn"],
+          youtube: item["YouTube"],
+          tiktok: item["TikTok"],
+          github: item["GitHub"]
+        }));
+        renderCategories();
+      })
+      .catch(error => {
+        console.error("Error fetching project data:", error);
+      });
+
+    /* Utility function to generate a fallback email if needed */
+    function getProjectEmail(project) {
+      return project.contactEmail || project.title.toLowerCase().replace(/\s+/g, '') + "@stjohns.edu";
+    }
+
+    /* Comments Data (static/mock for now) */
+    let commentsData = [
+      {
+        author: "Alice Johnson",
+        text: "This project looks really promising!",
+        replies: [
+          { author: "Bob Smith", text: "I agree, the concept is innovative." },
+          { author: "Carol Evans", text: "Can't wait to see it in action." }
+        ]
+      },
+      {
+        author: "Dave Brown",
+        text: "Are there any prerequisites for joining this project?",
+        replies: [
+          { author: "Eve Adams", text: "I believe it's open to everyone with interest." }
+        ]
+      }
+    ];
+
+    /* Utility functions for comments */
+    function getInitials(name) {
+      const parts = name.trim().split(' ');
+      return parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : (name.length > 1 ? (name[0] + name[name.length - 1]).toUpperCase() : name.toUpperCase());
+    }
+    function getRandomColor() {
+      const r = Math.floor(Math.random() * (200 - 50) + 50);
+      const g = Math.floor(Math.random() * (200 - 50) + 50);
+      const b = Math.floor(Math.random() * (200 - 50) + 50);
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    function renderCommentItem(comment) {
+      const commentItem = document.createElement('div');
+      commentItem.className = "comment-item";
+
+      const pfp = document.createElement('div');
+      pfp.className = 'pfp';
+      pfp.style.backgroundColor = getRandomColor();
+      pfp.textContent = getInitials(comment.author);
+      commentItem.appendChild(pfp);
+
+      const content = document.createElement('div');
+      content.className = 'comment-content';
+      const textP = document.createElement('p');
+      textP.innerHTML = `<strong>${comment.author}:</strong> ${comment.text}`;
+      content.appendChild(textP);
+      commentItem.appendChild(content);
+
+      return commentItem;
+    }
+
+    function renderComment(comment) {
+      const container = document.createElement('div');
+      container.className = "comment-container";
+      const commentElement = renderCommentItem(comment);
+
+      const commentContent = commentElement.querySelector('.comment-content');
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'comment-actions';
+
+      let repliesContainer = null;
+      if (comment.replies && comment.replies.length > 0) {
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'toggle-replies';
+        toggleButton.textContent = 'Show replies';
+        actionsDiv.appendChild(toggleButton);
+
+        repliesContainer = document.createElement('div');
+        repliesContainer.className = 'replies-container';
+        comment.replies.forEach(reply => {
+          const replyElement = renderCommentItem(reply);
+          repliesContainer.appendChild(replyElement);
+        });
+        toggleButton.addEventListener('click', () => {
+          if (repliesContainer.style.display === 'none' || repliesContainer.style.display === '') {
+            repliesContainer.style.display = 'block';
+            toggleButton.textContent = 'Hide replies';
+          } else {
+            repliesContainer.style.display = 'none';
+            toggleButton.textContent = 'Show replies';
+          }
+        });
+      }
+
+      const replyButton = document.createElement('button');
+      replyButton.className = 'reply-button';
+      replyButton.textContent = 'Reply';
+      actionsDiv.appendChild(replyButton);
+
+      commentContent.appendChild(actionsDiv);
+      container.appendChild(commentElement);
+
+      if (repliesContainer) {
+        container.appendChild(repliesContainer);
+      }
+
+      replyButton.addEventListener('click', () => {
+        if (container.querySelector('.reply-form')) return;
+        const replyForm = document.createElement('form');
+        replyForm.className = 'reply-form';
+        const replyInput = document.createElement('input');
+        replyInput.type = 'text';
+        replyInput.placeholder = 'Add a reply...';
+        replyInput.required = true;
+        const postReplyButton = document.createElement('button');
+        postReplyButton.type = 'submit';
+        postReplyButton.textContent = 'Post';
+        const cancelReplyButton = document.createElement('button');
+        cancelReplyButton.type = 'button';
+        cancelReplyButton.textContent = 'Cancel';
+        replyForm.appendChild(replyInput);
+        replyForm.appendChild(postReplyButton);
+        replyForm.appendChild(cancelReplyButton);
+        if (repliesContainer) {
+          container.insertBefore(replyForm, repliesContainer);
+        } else {
+          container.appendChild(replyForm);
+        }
+        replyInput.focus();
+
+        replyForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const replyText = replyInput.value.trim();
+          if (replyText) {
+            if (!comment.replies) comment.replies = [];
+            comment.replies.push({ author: "John Doe", text: replyText, replies: [] });
+            renderComments(commentsData);
+          }
+        });
+
+        cancelReplyButton.addEventListener('click', () => {
+          replyForm.remove();
+        });
+      });
+      return container;
+    }
+
+    function renderComments(comments) {
+      const container = document.getElementById('commentsContainer');
+      container.innerHTML = "";
+      comments.forEach(comment => {
+        const commentContainer = renderComment(comment);
+        container.appendChild(commentContainer);
+      });
+    }
+
+    /* Modal and Captcha references */
+    const modal = document.getElementById('modal');
+    const modalHeader = document.getElementById('modalHeader');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalProjectInfo = document.getElementById('modalProjectInfo');
+    const closeModalBtn = document.querySelector('.close');
+
+    function openModal(project, idx) {
+      // Clear previous modal header
+      modalHeader.innerHTML = "";
+      // Create a flex container for header with two sides:
+      const headerContainer = document.createElement('div');
+      headerContainer.style.display = "flex";
+      headerContainer.style.justifyContent = "space-between";
+      headerContainer.style.alignItems = "center";
+      headerContainer.style.width = "100%";
+
+      // Left container: project logo and title
+      const leftContainer = document.createElement('div');
+      leftContainer.className = "title-container";
+      leftContainer.style.display = "flex";
+      leftContainer.style.alignItems = "center";
+      const logoImg = document.createElement('img');
+      logoImg.src = project.logo || "https://images.vexels.com/media/users/3/137617/isolated/preview/c45afb857e72b86e87baaf255f71ff37-geometric-logo-abstract-by-vexels.png";
+      logoImg.alt = "Project Logo";
+      logoImg.className = "project-logo";
+      // Add click listener to open the big logo modal
+      logoImg.addEventListener('click', () => {
+        openLogoModal(logoImg.src);
+      });
+      const titleText = document.createElement('h3');
+      titleText.textContent = project.title;
+      leftContainer.appendChild(logoImg);
+      leftContainer.appendChild(titleText);
+
+      // Right container: Visit button (shifted slightly left using margin)
+      const rightContainer = document.createElement('div');
+      rightContainer.style.marginRight = "20px";
+      const visitBtn = document.createElement('button');
+      visitBtn.className = "visit-button";
+      visitBtn.textContent = "Visit";
+      visitBtn.addEventListener('click', () => {
+        if (project.demoLink && project.demoLink.trim() !== "") {
+          window.open(project.demoLink, "_blank");
+        } else {
+          openNoDemoModal();
+        }
+      });
+      rightContainer.appendChild(visitBtn);
+
+      headerContainer.appendChild(leftContainer);
+      headerContainer.appendChild(rightContainer);
+      modalHeader.appendChild(headerContainer);
+
+      modalDescription.textContent = project.modalDescription || project.description;
+
+      modalProjectInfo.innerHTML = "";
+      const schoolDiv = document.createElement('div');
+      schoolDiv.className = "project-school";
+      const schoolIcon = document.createElement('img');
+      schoolIcon.className = "icon";
+      schoolIcon.src = "https://i.imgur.com/EkoIEZj.png";
+      schoolIcon.alt = "School Icon";
+      const schoolText = document.createElement('span');
+      schoolText.textContent = " " + (project.school || "St Johns University");
+      schoolDiv.appendChild(schoolIcon);
+      schoolDiv.appendChild(schoolText);
+      modalProjectInfo.appendChild(schoolDiv);
+
+      const contactDiv = document.createElement('div');
+      contactDiv.className = "project-contact";
+      const contactIcon = document.createElement('img');
+      contactIcon.className = "contact-icon";
+      contactIcon.src = "https://imgur.com/va70cTC.png";
+      contactIcon.alt = "Contact Icon";
+      contactIcon.style.filter = "grayscale(100%) brightness(0.6)";
+      const viewEmailBtn = document.createElement('button');
+      viewEmailBtn.textContent = "View Email Address";
+      viewEmailBtn.style.background = "#eee";
+      viewEmailBtn.style.color = "#555";
+      viewEmailBtn.style.borderRadius = "12px";
+      viewEmailBtn.style.border = "none";
+      viewEmailBtn.style.padding = "4px 8px";
+      viewEmailBtn.style.fontSize = "0.8em";
+
+      const emailSpan = document.createElement('span');
+      emailSpan.className = "email-address";
+      emailSpan.style.display = "none";
+      emailSpan.textContent = project.contactEmail || getProjectEmail(project);
+
+      const copyTooltip = document.createElement('span');
+      copyTooltip.className = "copy-tooltip";
+      copyTooltip.textContent = "Click to copy";
+      emailSpan.appendChild(copyTooltip);
+
+      const emailWrapper = document.createElement('div');
+      emailWrapper.style.position = "relative";
+      emailWrapper.appendChild(emailSpan);
+
+      contactDiv.appendChild(contactIcon);
+      contactDiv.appendChild(viewEmailBtn);
+      contactDiv.appendChild(emailWrapper);
+      modalProjectInfo.appendChild(contactDiv);
+
+      const participantsDiv = document.createElement('div');
+      participantsDiv.className = "project-participants";
+      const participantsIcon = document.createElement('img');
+      participantsIcon.className = "icon";
+      participantsIcon.src = "https://i.imgur.com/Yxqk42o.png";
+      participantsIcon.alt = "Participants Icon";
+      const participantsText = document.createElement('span');
+      participantsText.textContent = " " + (project.participants || participantRanges[idx % participantRanges.length]);
+      participantsDiv.appendChild(participantsIcon);
+      participantsDiv.appendChild(participantsText);
+      modalProjectInfo.appendChild(participantsDiv);
+
+      const modalTags = document.createElement('div');
+      modalTags.className = "tags";
+      project.tags.forEach(tag => {
+        const tagSpan = document.createElement('span');
+        tagSpan.className = "tag";
+        tagSpan.textContent = tag;
+        modalTags.appendChild(tagSpan);
+      });
+      modalProjectInfo.appendChild(modalTags);
+      
+      /* Social Icons Section */
+      const socialContainer = document.createElement('div');
+      socialContainer.className = "social-links";
+      socialContainer.style.marginTop = "10px";
+      // Create an array of social objects with name, icon URL (converted to proper direct links), and associated link
+      const socials = [
+        { name: "Instagram", icon: "https://i.imgur.com/nqwRnQE.png", link: project.instagram },
+        { name: "LinkedIn", icon: "https://i.imgur.com/Gy8GfvE.png", link: project.linkedIn },
+        { name: "YouTube", icon: "https://i.imgur.com/0N1oxHH.png", link: project.youtube },
+        { name: "TikTok", icon: "https://i.imgur.com/F1J2FqH.png", link: project.tiktok },
+        { name: "GitHub", icon: "https://i.imgur.com/65TtGM5.png", link: project.github }
+      ];
+      socials.forEach(social => {
+        const iconDiv = document.createElement('div');
+        iconDiv.className = "social-icon";
+        // Set up the masked icon so that it displays as a solid light gray shape
+        iconDiv.style.backgroundColor = "#aaa";
+        iconDiv.style.webkitMaskImage = `url(${social.icon})`;
+        iconDiv.style.maskImage = `url(${social.icon})`;
+        iconDiv.style.webkitMaskSize = "contain";
+        iconDiv.style.maskSize = "contain";
+        iconDiv.style.webkitMaskRepeat = "no-repeat";
+        iconDiv.style.maskRepeat = "no-repeat";
+        iconDiv.style.webkitMaskPosition = "center";
+        iconDiv.style.maskPosition = "center";
+        iconDiv.addEventListener('click', () => {
+          if (social.link && social.link.trim() !== "") {
+            window.open(social.link, "_blank");
+          } else {
+            openSocialLinkModal(social.name);
+          }
+        });
+        socialContainer.appendChild(iconDiv);
+      });
+      modalProjectInfo.appendChild(socialContainer);
+
+      viewEmailBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openCaptchaModal();
+        viewEmailBtn.style.display = "none";
+      });
+
+      renderComments(commentsData);
+      modal.style.display = "block";
+    }
+
+    closeModalBtn.addEventListener('click', () => {
+      modal.style.display = "none";
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target == modal) {
+        modal.style.display = "none";
+      }
+    });
+
+    const captchaModal = document.getElementById('captchaModal');
+    const captchaConfirmBtn = document.getElementById('captchaConfirmBtn');
+    const captchaClose = document.getElementById('captchaClose');
+    function openCaptchaModal() {
+      captchaModal.style.display = "block";
+      captchaConfirmBtn.textContent = "Verifying...";
+      captchaConfirmBtn.disabled = true;
+      setTimeout(() => {
+        captchaModal.style.display = "none";
+        captchaConfirmBtn.disabled = false;
+        const emailSpan = document.querySelector('.email-address');
+        emailSpan.style.display = "inline";
+      }, 2000);
+    }
+    captchaClose.addEventListener('click', function() {
+      captchaModal.style.display = "none";
+    });
+    window.addEventListener('click', function(e) {
+      if (e.target == captchaModal) {
+        captchaModal.style.display = "none";
+      }
+    });
+
+    /* No Demo Modal Logic */
+    const noDemoModal = document.getElementById('noDemoModal');
+    const noDemoClose = document.getElementById('noDemoClose');
+    const noDemoOkBtn = document.getElementById('noDemoOkBtn');
+    function openNoDemoModal() {
+      noDemoModal.style.display = "block";
+    }
+    noDemoClose.addEventListener('click', () => {
+      noDemoModal.style.display = "none";
+    });
+    noDemoOkBtn.addEventListener('click', () => {
+      noDemoModal.style.display = "none";
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target == noDemoModal) {
+        noDemoModal.style.display = "none";
+      }
+    });
+
+    /* Social Link Modal Logic */
+    function openSocialLinkModal(socialName) {
+      const socialModal = document.getElementById("socialModal");
+      const socialModalTitle = document.getElementById("socialModalTitle");
+      const socialModalMessage = document.getElementById("socialModalMessage");
+      socialModalTitle.textContent = socialName + " Link Not Available";
+      socialModalMessage.textContent = "This " + socialName + " link is not available for this project.";
+      socialModal.style.display = "block";
+    }
+    document.getElementById("socialModalClose").addEventListener('click', () => {
+      document.getElementById("socialModal").style.display = "none";
+    });
+    document.getElementById("socialModalOkBtn").addEventListener('click', () => {
+      document.getElementById("socialModal").style.display = "none";
+    });
+    window.addEventListener('click', (e) => {
+      const socialModal = document.getElementById("socialModal");
+      if (e.target == socialModal) {
+        socialModal.style.display = "none";
+      }
+    });
+
+    /* Logo Modal Logic */
+    const logoModal = document.getElementById('logoModal');
+    const logoModalClose = document.getElementById('logoModalClose');
+    const logoModalImage = document.getElementById('logoModalImage');
+    function openLogoModal(logoUrl) {
+      logoModalImage.src = logoUrl;
+      logoModal.style.display = "block";
+    }
+    logoModalClose.addEventListener('click', () => {
+      logoModal.style.display = "none";
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target == logoModal) {
+        logoModal.style.display = "none";
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      let emailEl = null;
+      if (e.target.classList.contains('email-address')) {
+        emailEl = e.target;
+      } else if (e.target.parentElement && e.target.parentElement.classList.contains('email-address')) {
+        emailEl = e.target.parentElement;
+      }
+      if (emailEl) {
+        const tooltip = emailEl.querySelector('.copy-tooltip');
+        const email = emailEl.textContent.replace(tooltip.textContent, "").trim();
+        navigator.clipboard.writeText(email).then(() => {
+          tooltip.textContent = "Copied to clipboard";
+          setTimeout(() => {
+            tooltip.textContent = "Click to copy";
+          }, 2000);
+        });
+      }
+    });
+
+    function renderCategories(filter = "") {
+      const container = document.getElementById('categoriesContainer');
+      container.innerHTML = "";
+
+      categories.forEach(category => {
+        let catProjects = projects.filter(p => p.category === category);
+
+        if (filter.trim() !== "") {
+          catProjects = catProjects.filter(p =>
+            p.title.toLowerCase().includes(filter.toLowerCase()) ||
+            p.description.toLowerCase().includes(filter.toLowerCase()) ||
+            p.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
+          );
+        }
+
+        if (catProjects.length > 0) {
+          const sectionHeader = document.createElement('h2');
+          sectionHeader.className = "category-header";
+          sectionHeader.textContent = category;
+          container.appendChild(sectionHeader);
+
+          const grid = document.createElement('div');
+          grid.className = "category-projects";
+
+          catProjects.slice(0, 4).forEach((project, idx) => {
+            const card = document.createElement('div');
+            card.className = "project-card";
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = "project-header";
+            const logoImg = document.createElement('img');
+            logoImg.src = project.logo || "https://images.vexels.com/media/users/3/137617/isolated/preview/c45afb857e72b86e87baaf255f71ff37-geometric-logo-abstract-by-vexels.png";
+            logoImg.alt = "Project Logo";
+            logoImg.className = "project-logo";
+            const title = document.createElement('h3');
+            title.textContent = project.title;
+
+            headerDiv.appendChild(logoImg);
+            headerDiv.appendChild(title);
+            card.appendChild(headerDiv);
+
+            const desc = document.createElement('p');
+            desc.textContent = project.description;
+            card.appendChild(desc);
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = "project-info";
+            infoDiv.textContent = (project.school || "St Johns University") + " • " + (project.participants || participantRanges[idx % participantRanges.length]);
+            card.appendChild(infoDiv);
+
+            const tagsDiv = document.createElement('div');
+            tagsDiv.className = "tags";
+            project.tags.forEach(tag => {
+              const tagSpan = document.createElement('span');
+              tagSpan.className = "tag";
+              tagSpan.textContent = tag;
+              tagsDiv.appendChild(tagSpan);
+            });
+            card.appendChild(tagsDiv);
+
+            card.addEventListener('click', () => {
+              openModal(project, idx);
+            });
+
+            grid.appendChild(card);
+          });
+
+          container.appendChild(grid);
+        }
+      });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      renderCategories(e.target.value);
+    });
+
+    document.getElementById('newCommentForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const commentInput = document.getElementById('newCommentInput');
+      const text = commentInput.value.trim();
+      if (text) {
+        commentsData.unshift({ author: "John Doe", text: text, replies: [] });
+        renderComments(commentsData);
+        commentInput.value = "";
+      }
+    });
+    document.getElementById('cancelNewComment').addEventListener('click', () => {
+      const commentInput = document.getElementById('newCommentInput');
+      commentInput.value = "";
+      commentInput.blur();
+    });
+  </script>
+</body>
+</html>

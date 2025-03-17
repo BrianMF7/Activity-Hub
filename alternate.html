@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Submit Your Project</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Cropper.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <style>
+    /* Submission Form & Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #007BFF, #00aaff, #00ccff);
+      background-attachment: fixed;
+      margin: 0;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      color: #333;
+    }
+    .background-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .background-shapes .shape-diamond {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: rgba(255,255,255,0.15);
+      top: 20%;
+      left: -50px;
+      transform: rotate(45deg);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    }
+    .background-shapes .shape-hexagon {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      bottom: 10%;
+      right: -60px;
+      transform: rotate(30deg);
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    }
+    .background-shapes .hero-shape.shape-3 {
+      position: absolute;
+      top: 10%;
+      right: 15%;
+      width: 100px;
+      height: 100px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      transform: rotate(-20deg);
+    }
+    .background-shapes .hero-shape.shape-4 {
+      position: absolute;
+      bottom: 15%;
+      left: 10%;
+      width: 120px;
+      height: 80px;
+      background: rgba(255,255,255,0.15);
+      transform: rotate(15deg);
+      clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 0% 100%);
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+      border: 1px solid rgba(255,255,255,0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 1;
+    }
+    h2#formTitle {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .section-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin: 20px 0 10px 0;
+      color: #333;
+    }
+    /* Dynamic step titles (set via JS) */
+    #projectOverviewTitle,
+    #projectDetailsTitle,
+    #socialLinksTitle,
+    #reviewTitle { }
+    .description-text {
+      font-size: 1em;
+      color: #555;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    label {
+      font-weight: 500;
+      margin-top: 15px;
+      display: block;
+      font-size: 1em;
+      color: #333;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+      width: calc(100% - 24px);
+      padding: 12px;
+      margin: 12px 12px 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      color: #333;
+      font-size: 1em;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    select:focus {
+      border-color: #007BFF;
+      box-shadow: 0 0 8px rgba(0,123,255,0.6);
+    }
+    input[type="file"] { display: none; }
+    .custom-file-label {
+      display: inline-block;
+      background-color: #007BFF;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background-color 0.3s ease;
+    }
+    .custom-file-label:hover { background-color: #0056b3; }
+    .button-container { text-align: center; margin-top: 20px; }
+    #step0 .button-container { display: flex; justify-content: space-around; }
+    @media (max-width: 480px) {
+      #step0 .button-container { flex-direction: column; align-items: center; }
+      #step0 .button-container button { width: 90%; margin: 5px 0; }
+    }
+    button,
+    input[type="submit"] {
+      background-color: #007BFF;
+      color: #fff;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      margin: 0 5px;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    button:hover,
+    input[type="submit"]:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+    .button-container button.selected { background-color: #28a745; transform: scale(1.05); }
+    .select-button {
+      background-color: #007BFF;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      margin: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .select-button.selected { background-color: #28a745; transform: scale(1.05); }
+    /* Make project type icons white */
+    .select-button img { filter: brightness(0) saturate(100%) invert(1); }
+    .progress-container {
+      width: 100%;
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 5px;
+      margin-bottom: 30px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 30px;
+    }
+    .progress-bar {
+      height: 30px;
+      background-color: #007BFF;
+      border-radius: 5px;
+      transition: width 0.5s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+    }
+    .circle-container { display: none; }
+    .hidden { display: none; }
+    @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+    .fade-in { animation: fadeIn 0.5s forwards; }
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    #loadingOverlay .loader {
+      width: 50px; height: 50px;
+      background: #007BFF;
+      margin-bottom: 20px;
+      animation: dance 1s infinite;
+    }
+    #loadingOverlay p { font-size: 1.2em; color: #333; text-align: center; }
+    @keyframes dance {
+      0% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-10px) rotate(15deg); }
+      50% { transform: translateY(0) rotate(0deg); }
+      75% { transform: translateY(10px) rotate(-15deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+    #successMessage {
+      display: none;
+      text-align: center;
+      margin-top: 40px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      color: #333;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .input-group { position: relative; margin-bottom: 20px; }
+    .input-group .tooltip {
+      position: absolute; top: -35px; left: 0;
+      background: rgba(0,0,0,0.8); color: #fff;
+      padding: 6px 10px; border-radius: 4px;
+      font-size: 0.85em; opacity: 0;
+      transform: translateY(10px); pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      white-space: nowrap; z-index: 10;
+    }
+    .input-group .tooltip::after {
+      content: "";
+      position: absolute; bottom: -5px; left: 10px;
+      border-width: 5px; border-style: solid;
+      border-color: rgba(0,0,0,0.8) transparent transparent transparent;
+    }
+    .input-group:hover .tooltip,
+    .input-group:focus-within .tooltip {
+      opacity: 1; transform: translateY(0);
+    }
+    .image-preview-container {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .image-preview {
+      width: 80px; height: 80px;
+      object-fit: cover;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .file-name {
+      font-size: 0.9em;
+      color: #555;
+      cursor: pointer;
+    }
+    #cropModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    #cropModal.hidden { display: none; }
+    #cropContainer {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90%;
+    }
+    #cropImage { max-width: 100%; max-height: 60vh; }
+    #modalButtons, #cropControls { margin-top: 15px; }
+    #modalButtons button, #cropControls button {
+      margin: 10px 5px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007BFF;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #modalButtons button:hover, #cropControls button:hover {
+      background-color: #0056b3;
+    }
+    #cropControls { display: none; }
+    .review-section {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+      margin-bottom: 10px;
+    }
+    .review-section h3 {
+      margin: 0 0 10px;
+      font-size: 1.2em;
+      color: #007BFF;
+    }
+    .review-section p { margin: 5px 0; }
+    .review-input { margin: 5px 0; }
+    /* Preview Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 5px;
+      position: relative;
+      color: #333;
+      text-align: center;
+    }
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus { color: #000; text-decoration: none; }
+    /* Preview Modal Header */
+    #previewModalHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #previewModalHeader .title-container {
+      display: flex;
+      align-items: center;
+    }
+    #previewModalHeader img.project-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 10px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+    #previewModalHeader h3 { font-size: 1.5em; margin: 0; }
+    #previewModalDescription { margin-bottom: 10px; }
+    /* Preview Modal Project Info */
+    #previewModalProjectInfo {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #555;
+    }
+    #previewModalProjectInfo .project-school,
+    #previewModalProjectInfo .project-participants,
+    #previewModalProjectInfo .project-contact { margin-bottom: 5px; }
+    #previewModalProjectInfo img.icon,
+    #previewModalProjectInfo img.contact-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    /* Preview Modal Tags */
+    #previewModalProjectInfo .tags { margin-top: 5px; }
+    #previewModalProjectInfo .tag {
+      display: inline-block;
+      background: #eee;
+      color: #555;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 0.8em;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    /* Preview Modal Social Links */
+    #previewModalSocialLinks {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    /* Social icons styling in preview modal */
+    #previewModalSocialLinks .social-icon {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      background-color: #aaa;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      display: inline-block;
+    }
+    #previewModalSocialLinks .social-icon:hover { opacity: 0.8; }
+    .visit-button {
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
+    /* Preview Project Button Icon */
+    .preview-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      vertical-align: middle;
+      filter: brightness(0) saturate(100%) invert(1);
+    }
+    /* Tooltip for click-to-copy email */
+    .email-address .copy-tooltip {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 3px 6px;
+      font-size: 0.75em;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .email-address:hover .copy-tooltip { visibility: visible; opacity: 1; }
+    /* Smoother Assembling Animation for Preview Items */
+    .assemble-item {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      animation: assembleItem 0.8s ease-out forwards;
+    }
+    .assemble-item:nth-child(1) { animation-delay: 0.2s; }
+    .assemble-item:nth-child(2) { animation-delay: 0.3s; }
+    .assemble-item:nth-child(3) { animation-delay: 0.4s; }
+    .assemble-item:nth-child(4) { animation-delay: 0.5s; }
+    @keyframes assembleItem {
+      0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+      50% { opacity: 0.6; transform: translateY(15px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* Edit Icon styling (all icons now 16x16) */
+    .edit-icon {
+      width: 16px;
+      height: 16px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    /* Edit Modal specific styling for better centering */
+    #editModal .modal-content {
+      text-align: center;
+    }
+    #editModalInputContainer {
+      margin: 20px auto;
+      width: 80%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Submission Form -->
+  <div class="background-shapes">
+    <div class="shape-diamond"></div>
+    <div class="shape-hexagon"></div>
+    <div class="hero-shape shape-3"></div>
+    <div class="hero-shape shape-4"></div>
+  </div>
+  <div class="form-container">
+    <h2 id="formTitle">Submit Your Project</h2>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar">Step 1 / 7</div>
+      <div class="circle-container" id="circleContainer"></div>
+    </div>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSeXyQeEF8mJdILhOuI44PNayI5AMmsC6IbFPuPoIjUNGSqVZQ/formResponse" 
+          method="POST" id="submissionForm" target="hidden_iframe">
+      <!-- STEP 0: ACCOUNT SETUP -->
+      <div id="step0">
+        <div class="section-title">Account Setup</div>
+        <p class="description-text">An account is required to upload a project. Please indicate whether you already have an account or need to create one.</p>
+        <div class="button-container">
+          <button type="button" onclick="setFlow(true)">I have an account</button>
+          <button type="button" onclick="setFlow(false)">I need to create one</button>
+        </div>
+      </div>
+      <!-- STEP 1a: ACCOUNT CREATION -->
+      <div id="step1_create" class="hidden">
+        <div class="section-title">Account Creation</div>
+        <p class="description-text">Please enter your email and create a password. You must create an account before uploading your project.</p>
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" name="entry.1302831663" id="email" required />
+          <div class="tooltip">Use an email you will still have access to (e.g., Gmail, Outlook)</div>
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" name="entry.1633033794" id="password" required />
+          <div class="tooltip">Create a secure password</div>
+        </div>
+        <div id="createError" style="color: #FF8080; text-align: center;"></div>
+        <div class="button-container">
+          <button type="button" onclick="prevStep()">Back</button>
+          <button type="button" onclick="checkAccountCreation()">Next</button>
+        </div>
+      </div>
+      <!-- STEP 1b: LOGIN -->
+      <div id="step1_login" class="hidden">
+        <div class="section-title">Login</div>
+        <p class="description-text">Please enter your email and password.</p>
+        <div class="input-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" required />
+          <div class="tooltip">Enter your login email</div>
+        </div>
+        <div class="input-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required />
+          <div class="tooltip">Enter your login password</div>
+        </div>
+        <div id="loginError" style="color: #FF8080; text-align: center;"></div>
+        <div class="button-container">
+          <button type="button" onclick="prevStep()">Back</button>
+          <button type="button" onclick="attemptLogin()">Login</button>
+          <br/><br/>
+          <a href="#" onclick="forgotPassword()">Forgot my password</a>
+        </div>
+      </div>
+      <!-- STEP 2: PERSONAL INFORMATION (New Account Only) -->
+      <div id="step4" class="hidden">
+        <div class="section-title">Personal Information</div>
+        <div class="input-group">
+          <label for="firstName">First Name</label>
+          <input type="text" name="entry.558536691" id="firstName" required />
+          <div class="tooltip">Enter your first name</div>
+        </div>
+        <div class="input-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" name="entry.1158899171" id="lastName" required />
+          <div class="tooltip">Enter your last name</div>
+        </div>
+        <div class="input-group">
+          <label for="eduEmail">Educational Email</label>
+          <input type="text" name="entry.591976255" id="eduEmail" required />
+          <div class="tooltip">Enter your educational email (e.g., yourname@school.edu)</div>
+        </div>
+        <div class="input-group">
+          <label for="college">College</label>
+          <input type="text" name="entry.305561957" id="college" required />
+          <div class="tooltip">Enter your college or university name</div>
+        </div>
+        <div class="input-group">
+          <label for="major">Major</label>
+          <input type="text" name="entry.2056172019" id="major" />
+          <div class="tooltip">Enter your major or field of study</div>
+        </div>
+        <div class="input-group">
+          <label for="profilePicture">Profile Picture</label>
+          <input type="file" id="profilePicture" accept="image/*" />
+          <label for="profilePicture" class="custom-file-label">Choose Profile Picture</label>
+          <div class="image-preview-container" id="profilePreviewContainer"></div>
+        </div>
+        <input type="hidden" name="entry.1076193597" id="profilePictureURL" />
+        <div class="button-container">
+          <button type="button" onclick="prevStep()">Back</button>
+          <button type="button" onclick="nextStep()">Continue</button>
+        </div>
+      </div>
+      <!-- STEP 3: PROJECT TYPE -->
+      <div id="stepProjectType" class="hidden">
+        <div class="section-title">Project Type</div>
+        <div class="input-group">
+          <label>Project Type</label>
+          <button type="button" class="select-button" data-value="Organization" onclick="toggleSelection('projectType', this)">
+            <img src="https://i.imgur.com/kjRVtI5.png" alt="Organization" style="vertical-align: middle; margin-right: 8px; width:20px; height:20px;"> Organization
+          </button>
+          <button type="button" class="select-button" data-value="Startup" onclick="toggleSelection('projectType', this)">
+            <img src="https://i.imgur.com/GXFRt9p.png" alt="Startup" style="vertical-align: middle; margin-right: 8px; width:20px; height:20px;"> Startup
+          </button>
+          <button type="button" class="select-button" data-value="Small Business" onclick="toggleSelection('projectType', this)">
+            <img src="https://i.imgur.com/suakO06.png" alt="Small Business" style="vertical-align: middle; margin-right: 8px; width:20px; height:20px;"> Small Business
+          </button>
+          <button type="button" class="select-button" data-value="Research & Development" onclick="toggleSelection('projectType', this)">
+            <img src="https://i.imgur.com/SFHodyh.png" alt="Research & Development" style="vertical-align: middle; margin-right: 8px; width:20px; height:20px;"> Research & Development
+          </button>
+          <div class="tooltip">Select one project type</div>
+        </div>
+        <input type="hidden" name="entry.362637871" id="projectTypeInput" />
+        <div class="button-container">
+          <button type="button" onclick="prevStep()">Back</button>
+          <button type="button" onclick="nextStep()">Continue</button>
+        </div>
+      </div>
+      <!-- STEP 4: PROJECT OVERVIEW -->
+      <div id="step2" class="hidden">
+        <div id="projectOverviewTitle" class="section-title">Project Overview</div>
+        <div class="input-group">
+          <label for="projectTitle">Project Title</label>
+          <input type="text" name="entry.244953197" id="projectTitle" required />
+          <div class="tooltip">Enter the title of your project</div>
+        </div>
+        <div class="input-group">
+          <label for="tagline">Tagline</label>
+          <input type="text" name="entry.1419351904" id="tagline" required />
+          <div class="tooltip">Enter a catchy tagline for your project</div>
+        </div>
+        <div class="input-group">
+          <label for="description">Description</label>
+          <input type="text" name="entry.1663281528" id="description" required />
+          <div class="tooltip">Provide a brief description of your project</div>
+        </div>
+        <div class="input-group">
+          <label for="123-ProjectContactEmail">Contact Email (Optional)</label>
+          <input type="email" name="entry.2065357189" id="123-ProjectContactEmail" placeholder="yourproject.contact@email"/>
+          <div class="tooltip">Provide an optional contact email for project inquiries</div>
+        </div>
+        <div class="input-group">
+          <label>Would you like to add a custom action button?</label>
+          <div class="button-container">
+            <button type="button" onclick="selectCustomActionChoice(true, this)">Yes</button>
+            <button type="button" onclick="selectCustomActionChoice(false, this)">No</button>
+          </div>
+        </div>
+        <div id="customActionFields" class="hidden">
+          <div class="input-group">
+            <label for="cta">Call-to-Action</label>
+            <input type="text" name="entry.1676023538" id="cta" />
+            <div class="tooltip">Enter a call-to-action phrase (e.g., "Learn More")</div>
+          </div>
+          <div class="input-group">
+            <label for="demoLink">Webpage or Live Demo</label>
+            <input type="text" name="entry.782134705" id="demoLink" />
+            <div class="tooltip">Enter the URL for your project's webpage or live demo</div>
+          </div>
+        </div>
+        <div class="button-container">
+          <button type="button" onclick="prevStep()">Back</button>
+          <button type="button" onclick="nextStep()">Continue</button>
+        </div>
+      </div>
+      <!-- STEP 5: PROJECT DETAILS -->
+      <div id="step3" class="hidden">
+        <div id="projectDetailsTitle" class="section-title">Project Details</div>
+        <div class="input-group">
+          <label for="missionType">Mission Type</label>
+          <select name="entry.2118515615" id="missionType" required>
+            <option value="For Profit">For Profit</option>
+            <option value="Non-Profit/Social Initiative">Non-Profit/Social Initiative</option>
+          </select>
+          <div class="tooltip">Select your project’s mission type</div>
+        </div>
+        <div class="input-group">
+          <label>Field</label>
+          <button type="button" class="select-button" data-value="STEM" onclick="toggleSelection('industry', this)">STEM</button>
+          <button type="button" class="select-button" data-value="Education & Learning" onclick="toggleSelection('industry', this)">Education & Learning</button>
+          <button type="button" class="select-button" data-value="Games & Entertainment" onclick="toggleSelection('industry', this)">Games & Entertainment</button>
+          <button type="button" class="select-button" data-value="Environment & Sustainability" onclick="toggleSelection('industry', this)">Environment & Sustainability</button>
+          <button type="button" class="select-button" data-value="Health & Wellness" onclick="toggleSelection('industry', this)">Health & Wellness</button>
+          <button type="button" class="select-button" data-value="Arts" onclick="toggleSelection('industry', this)">Arts</button>
+          <button type="button" class="select-button" data-value="Media" onclick="toggleSelection('industry', this)">Media</button>
+          <div class="tooltip">Select one or more fields</div>
+        </div>
+        <div class="input-group">
+          <label for="numParticipants">Number of Participants</label>
+          <select name="entry.1294678231" id="numParticipants" required>
+            <option value="Myself Only">Myself Only</option>
+            <option value="2-10 members">2-10 members</option>
+            <option value="11-50 members">11-50 members</option>
+            <option value="51-200 members">51-200 members</option>
+            <option value="201-500 members">201-500 members</option>
+            <option value="501-1,000 members">501-1,000 members</option>
+            <option value="1,001-5,000 members">1,001-5,000 members</option>
+            <option value="5,000+ members">5,000+ members</option>
+          </select>
+          <div class="tooltip">Select the number of participants in the project</div>
+        </div>
+        <div class="input-group">
+          <label for="logoImage">Logo Image</label>
+          <input type="file" id="logoImage" accept="image/*" />
+          <label for="logoImage" class="custom-file-label">Choose Logo Image</label>
+          <div class="image-preview-container" id="logoPreviewContainer"></div>
+        </div>
+        <input type="hidden" name="entry.2122459244" id="logoURL" />
+        <input type="hidden" name="entry.1103064816" id="industryInput" />
+        <p class="note">Note: You can now upload your logo image directly! We will host it on Imgur for you.</p>
+        <div class="button-container">
+          <button type="button" onclick="prevStep()">Back</button>
+          <button type="button" onclick="nextStep()">Continue</button>
+        </div>
+      </div>
+      <!-- STEP 6: SOCIAL LINKS -->
+      <div id="step5" class="hidden">
+        <div id="socialLinksTitle" class="section-title">Social Links</div>
+        <div class="input-group">
+          <label for="instagram">Instagram</label>
+          <input type="text" name="entry.2095010028" id="instagram" placeholder="https://yourInstagram.com/..." />
+          <div class="tooltip">Enter your project's Instagram URL</div>
+        </div>
+        <div class="input-group">
+          <label for="linkedin">LinkedIn</label>
+          <input type="text" name="entry.1802286959" id="linkedin" placeholder="https://yourLinkedIn.com/..." />
+          <div class="tooltip">Enter your project's LinkedIn URL</div>
+        </div>
+        <div class="input-group">
+          <label for="youtube">YouTube</label>
+          <input type="text" name="entry.53226177" id="youtube" placeholder="https://yourYouTube.com/..." />
+          <div class="tooltip">Enter your project's YouTube URL</div>
+        </div>
+        <div class="input-group">
+          <label for="tiktok">TikTok</label>
+          <input type="text" name="entry.1562451982" id="tiktok" placeholder="https://yourTikTok.com/..." />
+          <div class="tooltip">Enter your project's TikTok URL</div>
+        </div>
+        <div class="input-group">
+          <label for="github">GitHub</label>
+          <input type="text" name="entry.150994526" id="github" placeholder="https://yourGitHub.com/..." />
+          <div class="tooltip">Enter your project's GitHub URL</div>
+        </div>
+        <div class="input-group">
+          <label for="website">Website</label>
+          <input type="text" name="entry.414034471" id="website" placeholder="https://yourwebsite.com/..." />
+          <div class="tooltip">Enter your project's website URL</div>
+        </div>
+        <div class="input-group">
+          <label for="linktree">Linktree</label>
+          <input type="text" name="entry.2053647958" id="linktree" placeholder="https://linktr.ee/yourusername" />
+          <div class="tooltip">Enter your project's Linktree URL</div>
+        </div>
+        <div class="input-group">
+          <label for="disc">Discord</label>
+          <input type="text" name="entry.913273410" id="disc" placeholder="https://discord.gg/..." />
+          <div class="tooltip">Enter your project's Discord invite link</div>
+        </div>
+        <div class="input-group">
+          <label for="groupme">GroupMe</label>
+          <input type="text" name="entry.100258116" id="groupme" placeholder="https://groupme.com/..." />
+          <div class="tooltip">Enter your project's GroupMe group link</div>
+        </div>
+        <div class="input-group">
+          <label for="twitter">Twitter</label>
+          <input type="text" name="entry.680101451" id="twitter" placeholder="https://yourTwitter.com/..." />
+          <div class="tooltip">Enter your project's Twitter URL</div>
+        </div>
+        <div class="button-container">
+          <button type="button" onclick="prevStep()">Back</button>
+          <button type="button" onclick="nextStep()">Continue</button>
+        </div>
+      </div>
+      <!-- STEP 7: REVIEW & CONFIRM -->
+      <div id="step6" class="hidden">
+        <div id="reviewTitle" class="section-title">Review & Confirm</div>
+        <p>Please review your information below before submitting:</p>
+        <div id="reviewSection"></div>
+        <div class="button-container">
+          <button type="button" onclick="prevStep()">Back</button>
+          <button type="button" onclick="openPreviewModal()">
+            <img src="https://i.imgur.com/6fcLqWT.png" alt="Preview Icon" class="preview-icon">
+            Preview Project
+          </button>
+          <button type="button" id="confirmSubmitBtn" onclick="finalizeSubmission()">Confirm & Submit</button>
+        </div>
+      </div>
+      <!-- Hidden Fields -->
+      <input type="hidden" name="entry.1327198714" id="userID" />
+      <input type="hidden" name="entry.1121122435" id="projectID" />
+    </form>
+  </div>
+  <div id="loadingOverlay">
+    <div class="loader"></div>
+    <p>We're almost there, just a few more minutes...</p>
+  </div>
+  <div id="successMessage">
+    <h2>Submission Successful!</h2>
+    <p>Thank you for submitting your project. We will review it and get in touch with you shortly.</p>
+  </div>
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+  <div id="cropModal" class="hidden">
+    <div id="cropContainer">
+      <img id="cropImage" src="" alt="Crop Image" />
+      <div id="modalButtons">
+        <button type="button" id="useOriginalBtn">Looks Good</button>
+        <button type="button" id="openEditBtn">Edit</button>
+      </div>
+      <div id="cropControls">
+        <button type="button" id="rotateLeftBtn">Rotate Left</button>
+        <button type="button" id="rotateRightBtn">Rotate Right</button>
+        <button type="button" id="cropConfirmBtn">Confirm Edits</button>
+        <button type="button" id="cropCancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <!-- Preview Modal for Project Preview Feature -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="previewModalClose">&times;</span>
+      <div id="previewModalHeader"></div>
+      <p id="previewModalDescription"></p>
+      <div id="previewModalProjectInfo"></div>
+      <div id="previewModalSocialLinks"></div>
+    </div>
+  </div>
+  <!-- Captcha Modal for Email Verification (used in preview) -->
+  <div id="captchaModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="captchaClose">&times;</span>
+      <h3>Please confirm you're not a robot</h3>
+      <p>Click the button below to verify.</p>
+      <button id="captchaConfirmBtn">Verifying...</button>
+    </div>
+  </div>
+  <!-- Edit Modal for Field Editing -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="editModalClose">&times;</span>
+      <h3>Edit Field</h3>
+      <label id="editModalLabel"></label>
+      <!-- Container for the dynamically generated input element -->
+      <div id="editModalInputContainer"></div>
+      <div style="text-align:center; margin-top:20px;">
+        <button id="editModalSave">Save</button>
+      </div>
+    </div>
+  </div>
+  <!-- Cropper.js Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script>
+    /* --- Existing JS for Submission Form, Account, Image Cropping, etc. --- */
+    let isLoginFlow = false;
+    let loginSuccessful = false;
+    let loginData = {};
+    let flowSteps = [];
+    let currentStepIndex = 0;
+    const CLIENT_ID = "4693c5376af54cb";
+    let formSubmitted = false;
+    let currentCropper = null;
+    let currentImageType = "";
+    let croppedLogoData = "";
+    let croppedProfileData = "";
+  
+    function setFlow(isLogin) {
+      isLoginFlow = isLogin;
+      if (isLoginFlow) {
+        flowSteps = ["step0", "step1_login", "stepProjectType", "step2", "step3", "step5", "step6"];
+      } else {
+        flowSteps = ["step0", "step1_create", "step4", "stepProjectType", "step2", "step3", "step5", "step6"];
+      }
+      currentStepIndex = 0;
+      if (isLoginFlow) {
+        document.getElementById("step1_create").classList.add("hidden");
+      } else {
+        document.getElementById("step1_login").classList.add("hidden");
+      }
+      buildCircles();
+      nextStep();
+    }
+  
+    function buildCircles() {
+      const container = document.getElementById("circleContainer");
+      container.innerHTML = "";
+      for (let i = 0; i < flowSteps.length; i++) {
+        const circle = document.createElement("div");
+        circle.className = "circle" + (i === 0 ? " active" : "");
+        circle.textContent = i + 1;
+        container.appendChild(circle);
+      }
+      updateProgress();
+    }
+  
+    function showStep(index) {
+      flowSteps.forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+      });
+      const stepEl = document.getElementById(flowSteps[index]);
+      stepEl.classList.remove("hidden");
+      stepEl.classList.add("fade-in");
+      setTimeout(() => { stepEl.classList.remove("fade-in"); }, 500);
+      currentStepIndex = index;
+      updateProgress();
+      if (flowSteps[index] === "step6") { populateReview(); }
+    }
+  
+    function nextStep() {
+      if (currentStepIndex < flowSteps.length - 1) { showStep(currentStepIndex + 1); }
+    }
+  
+    function prevStep() {
+      if (currentStepIndex > 0) { showStep(currentStepIndex - 1); }
+    }
+  
+    function updateProgress() {
+      const percentage = (currentStepIndex / (flowSteps.length - 1)) * 100;
+      document.getElementById("progressBar").style.width = percentage + "%";
+      document.getElementById("progressBar").textContent = `Step ${currentStepIndex + 1} / ${flowSteps.length}`;
+      const circles = document.querySelectorAll(".circle");
+      circles.forEach((circle, idx) => {
+        circle.classList.toggle("active", idx <= currentStepIndex);
+      });
+    }
+  
+    async function checkAccountCreation() {
+      const email = document.getElementById("email").value.trim();
+      if (!email) return;
+      document.getElementById("loadingOverlay").style.display = "flex";
+      const res = await fetch("https://sheet2api.com/v1/rkmbUqHQAC3C/submission-form-responses");
+      const data = await res.json();
+      const exists = data.some(row => row.Email.toLowerCase() === email.toLowerCase());
+      if (exists) {
+        document.getElementById("createError").textContent = "This email already has an account. Please log in or use a different email.";
+        document.getElementById("loadingOverlay").style.display = "none";
+      } else {
+        document.getElementById("createError").textContent = "";
+        const userIDs = data.map(row => Number(row["User ID"]) || 0);
+        const newUserID = userIDs.length ? Math.max(...userIDs) + 1 : 1;
+        document.getElementById("userID").value = newUserID;
+        setTimeout(() => {
+          document.getElementById("loadingOverlay").style.display = "none";
+          nextStep();
+        }, 2000);
+      }
+    }
+  
+    async function attemptLogin() {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      if (!email || !password) return;
+      try {
+        const res = await fetch("https://sheet2api.com/v1/rkmbUqHQAC3C/submission-form-responses");
+        const data = await res.json();
+        const record = data.find(row =>
+          row.Email.toLowerCase() === email.toLowerCase() && row.Password === password
+        );
+        if (record) {
+          document.getElementById("firstName").value = record["First Name"] || "";
+          document.getElementById("lastName").value = record["Last Name"] || "";
+          document.getElementById("eduEmail").value = record["Email Address (.edu)"] || "";
+          document.getElementById("college").value = record["College or University Name"] || "";
+          document.getElementById("major").value = record["Major"] || "";
+          document.getElementById("userID").value = record["User ID"] || "";
+          document.getElementById("profilePictureURL").value = record["Profile Picture"] || "";
+          document.getElementById("email").value = email;
+          document.getElementById("password").value = password;
+          document.getElementById("loginError").textContent = "Login successful!";
+          nextStep();
+        } else {
+          document.getElementById("loginError").textContent = "Invalid email or password.";
+        }
+      } catch (err) {
+        console.error("Error during login:", err);
+      }
+    }
+  
+    function forgotPassword() {
+      alert("Please contact entrepreneur.hub.project@gmail.com for password recovery instructions.");
+    }
+  
+    const selectedValues = { projectType: [], industry: [] };
+    function toggleSelection(group, button) {
+      const value = button.getAttribute("data-value");
+      if (group === "projectType") {
+        const container = button.parentElement;
+        const buttons = container.querySelectorAll(".select-button");
+        buttons.forEach(btn => { btn.classList.remove("selected"); });
+        selectedValues[group] = [];
+        button.classList.add("selected");
+        selectedValues[group].push(value);
+        document.getElementById(group + "Input").value = value;
+        updateProjectTypeTitles(value);
+      } else {
+        button.classList.toggle("selected");
+        if (button.classList.contains("selected")) {
+          selectedValues[group].push(value);
+        } else {
+          selectedValues[group] = selectedValues[group].filter(item => item !== value);
+        }
+        document.getElementById(group + "Input").value = selectedValues[group].join(", ");
+      }
+    }
+  
+    function updateProjectTypeTitles(selectedValue) {
+      let displayValue = selectedValue;
+      if (selectedValue.toLowerCase().includes("research")) {
+        displayValue = "R&D";
+      }
+      document.getElementById("formTitle").innerText = "Submit Your " + displayValue + " Project";
+      document.getElementById("projectOverviewTitle").innerText = displayValue + " Overview";
+      document.getElementById("projectDetailsTitle").innerText = displayValue + " Details";
+      document.getElementById("socialLinksTitle").innerText = displayValue + " Social Links";
+      document.getElementById("reviewTitle").innerText = displayValue + " Review & Confirm";
+    }
+  
+    // Global variables for the edit modal
+    let currentEditField = "";
+    let currentEditInputElement = null;
+  
+    // openEditModal now handles special cases for projectTypeInput and industryInput so the modal rebuilds the original button groups.
+    function openEditModal(field) {
+      currentEditField = field;
+      const fieldElement = document.getElementById(field);
+      if (!fieldElement) return;
+      
+      // Special handling for "projectTypeInput"
+      if (field === "projectTypeInput") {
+        const container = document.createElement("div");
+        container.style.textAlign = "center";
+        const currentValue = fieldElement.value;
+        dropdownOptions.projectType.forEach(function(option) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "select-button";
+          btn.textContent = option;
+          btn.style.margin = "5px";
+          if (option === currentValue) btn.classList.add("selected");
+          btn.addEventListener("click", function() {
+            container.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            container.dataset.selected = option;
+          });
+          container.appendChild(btn);
+        });
+        currentEditInputElement = container;
+        document.getElementById("editModalLabel").textContent = "Project Type";
+        const editInputContainer = document.getElementById("editModalInputContainer");
+        editInputContainer.innerHTML = "";
+        editInputContainer.appendChild(container);
+        document.getElementById("editModal").style.display = "block";
+        return;
+      }
+      
+      // Special handling for "industryInput"
+      if (field === "industryInput") {
+        const container = document.createElement("div");
+        container.style.textAlign = "center";
+        const currentValues = fieldElement.value.split(",").map(s => s.trim()).filter(s => s !== "");
+        dropdownOptions.industry.forEach(function(option) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "select-button";
+          btn.textContent = option;
+          btn.style.margin = "5px";
+          if (currentValues.includes(option)) btn.classList.add("selected");
+          btn.addEventListener("click", function() {
+            btn.classList.toggle("selected");
+          });
+          container.appendChild(btn);
+        });
+        currentEditInputElement = container;
+        document.getElementById("editModalLabel").textContent = "Field(s)";
+        const editInputContainer = document.getElementById("editModalInputContainer");
+        editInputContainer.innerHTML = "";
+        editInputContainer.appendChild(container);
+        document.getElementById("editModal").style.display = "block";
+        return;
+      }
+      
+      // For other fields, if the original element is a radio group...
+      const tagName = fieldElement.tagName.toLowerCase();
+      let inputElement;
+      if (fieldElement.type === "radio") {
+        inputElement = document.createElement("div");
+        const radios = document.querySelectorAll(`input[name="${fieldElement.name}"]`);
+        radios.forEach(function(radio) {
+          const radioContainer = document.createElement("div");
+          radioContainer.style.margin = "5px";
+          const radioInput = document.createElement("input");
+          radioInput.type = "radio";
+          radioInput.name = fieldElement.name;
+          radioInput.value = radio.value;
+          if (radio.checked) { radioInput.checked = true; }
+          const radioLabel = document.createElement("label");
+          radioLabel.textContent = radio.value;
+          radioLabel.style.marginLeft = "5px";
+          radioContainer.appendChild(radioInput);
+          radioContainer.appendChild(radioLabel);
+          inputElement.appendChild(radioContainer);
+        });
+      } else if (tagName === "input") {
+        inputElement = document.createElement("input");
+        inputElement.type = fieldElement.type;
+        inputElement.value = fieldElement.value;
+      } else if (tagName === "select") {
+        inputElement = document.createElement("select");
+        for (let i = 0; i < fieldElement.options.length; i++) {
+          const option = document.createElement("option");
+          option.value = fieldElement.options[i].value;
+          option.text = fieldElement.options[i].text;
+          if (fieldElement.options[i].selected) { option.selected = true; }
+          inputElement.appendChild(option);
+        }
+      } else if (tagName === "textarea") {
+        inputElement = document.createElement("textarea");
+        inputElement.value = fieldElement.value;
+      } else {
+        inputElement = document.createElement("input");
+        inputElement.type = "text";
+        inputElement.value = fieldElement.value;
+      }
+      inputElement.style.width = "80%";
+      inputElement.style.padding = "8px";
+      inputElement.style.margin = "20px auto";
+      inputElement.style.display = "block";
+      let labelText = "";
+      switch(field) {
+        case "email": labelText = "Email"; break;
+        case "firstName": labelText = "First Name"; break;
+        case "lastName": labelText = "Last Name"; break;
+        case "eduEmail": labelText = "Educational Email"; break;
+        case "college": labelText = "College"; break;
+        case "major": labelText = "Major"; break;
+        case "projectTitle": labelText = "Project Title"; break;
+        case "tagline": labelText = "Tagline"; break;
+        case "description": labelText = "Description"; break;
+        case "123-ProjectContactEmail": labelText = "Contact Email"; break;
+        case "missionType": labelText = "Mission Type"; break;
+        default: labelText = field;
+      }
+      document.getElementById("editModalLabel").textContent = labelText;
+      const editInputContainer = document.getElementById("editModalInputContainer");
+      editInputContainer.innerHTML = "";
+      editInputContainer.appendChild(inputElement);
+      currentEditInputElement = inputElement;
+      document.getElementById("editModal").style.display = "block";
+    }
+  
+    document.getElementById("editModalSave").addEventListener("click", function() {
+      let newValue = "";
+      if (currentEditInputElement.tagName.toLowerCase() === "div" && currentEditField === "industryInput") {
+        const selectedButtons = currentEditInputElement.querySelectorAll("button.selected");
+        const values = Array.from(selectedButtons).map(btn => btn.textContent.trim());
+        newValue = values.join(", ");
+      } else if (currentEditInputElement.tagName.toLowerCase() === "div" && currentEditField === "projectTypeInput") {
+        const selectedButton = currentEditInputElement.querySelector("button.selected");
+        newValue = selectedButton ? selectedButton.textContent.trim() : "";
+      } else if (currentEditInputElement.tagName.toLowerCase() === "div") {
+        const radios = currentEditInputElement.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => { if (radio.checked) { newValue = radio.value; } });
+      } else {
+        newValue = currentEditInputElement.value;
+      }
+      const fieldElement = document.getElementById(currentEditField);
+      if (fieldElement) { fieldElement.value = newValue; }
+      closeEditModal();
+      populateReview();
+    });
+  
+    document.getElementById("editModalClose").addEventListener("click", closeEditModal);
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+    window.addEventListener("click", function(e) {
+      const editModal = document.getElementById("editModal");
+      if (e.target === editModal) { closeEditModal(); }
+    });
+  
+    // Image edit trigger function
+    function triggerImageEdit(type) {
+      if (type === "logo") { logoImageInput.click(); }
+      else if (type === "profile") { profilePictureInput.click(); }
+    }
+  
+    // Updated populateReview() that appends edit icons to text fields and image previews.
+    function populateReview() {
+      const reviewContainer = document.getElementById("reviewSection");
+      reviewContainer.innerHTML = "";
+      
+      if (!isLoginFlow) {
+        const accountSection = document.createElement("div");
+        accountSection.className = "review-section";
+        accountSection.innerHTML = `<h3>Account & Personal Information</h3>
+          <div class="review-input"><strong>Email:</strong> ${document.getElementById("email").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="email" alt="Edit Icon"></div>
+          <div class="review-input"><strong>First Name:</strong> ${document.getElementById("firstName").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="firstName" alt="Edit Icon"></div>
+          <div class="review-input"><strong>Last Name:</strong> ${document.getElementById("lastName").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="lastName" alt="Edit Icon"></div>
+          <div class="review-input"><strong>Educational Email:</strong> ${document.getElementById("eduEmail").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="eduEmail" alt="Edit Icon"></div>
+          <div class="review-input"><strong>College:</strong> ${document.getElementById("college").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="college" alt="Edit Icon"></div>
+          <div class="review-input"><strong>Major:</strong> ${document.getElementById("major").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="major" alt="Edit Icon"></div>
+          <div class="review-input"><strong>Profile Picture:</strong> ${document.getElementById("profilePicture").files[0] ? document.getElementById("profilePicture").files[0].name : "No file selected"}</div>`;
+        reviewContainer.appendChild(accountSection);
+      }
+      
+      const projectTypeSection = document.createElement("div");
+      projectTypeSection.className = "review-section";
+      projectTypeSection.innerHTML = `<h3>Project Type</h3>
+        <div class="review-input"><strong>Selected:</strong> ${document.getElementById("projectTypeInput").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="projectTypeInput" alt="Edit Icon"></div>`;
+      reviewContainer.appendChild(projectTypeSection);
+      
+      const overviewSection = document.createElement("div");
+      overviewSection.className = "review-section";
+      overviewSection.innerHTML = `<h3>Project Overview</h3>
+        <div class="review-input"><strong>Project Title:</strong> ${document.getElementById("projectTitle").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="projectTitle" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Tagline:</strong> ${document.getElementById("tagline").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="tagline" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Description:</strong> ${document.getElementById("description").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="description" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Contact Email:</strong> ${document.getElementById("123-ProjectContactEmail").value || "Not provided"} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="123-ProjectContactEmail" alt="Edit Icon"></div>`;
+      reviewContainer.appendChild(overviewSection);
+      
+      const detailsSection = document.createElement("div");
+      detailsSection.className = "review-section";
+      detailsSection.innerHTML = `<h3>Project Details</h3>
+        <div class="review-input"><strong>Mission Type:</strong> ${document.getElementById("missionType").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="missionType" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Field(s):</strong> ${document.getElementById("industryInput").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="industryInput" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Number of Participants:</strong> ${document.getElementById("numParticipants").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="numParticipants" alt="Edit Icon"></div>`;
+      reviewContainer.appendChild(detailsSection);
+      
+      const socialSection = document.createElement("div");
+      socialSection.className = "review-section";
+      socialSection.innerHTML = `<h3>Social Links</h3>
+        <div class="review-input"><strong>Instagram:</strong> ${document.getElementById("instagram").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="instagram" alt="Edit Icon"></div>
+        <div class="review-input"><strong>LinkedIn:</strong> ${document.getElementById("linkedin").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="linkedin" alt="Edit Icon"></div>
+        <div class="review-input"><strong>YouTube:</strong> ${document.getElementById("youtube").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="youtube" alt="Edit Icon"></div>
+        <div class="review-input"><strong>TikTok:</strong> ${document.getElementById("tiktok").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="tiktok" alt="Edit Icon"></div>
+        <div class="review-input"><strong>GitHub:</strong> ${document.getElementById("github").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="github" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Website:</strong> ${document.getElementById("website").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="website" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Linktree:</strong> ${document.getElementById("linktree").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="linktree" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Discord:</strong> ${document.getElementById("disc").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="disc" alt="Edit Icon"></div>
+        <div class="review-input"><strong>GroupMe:</strong> ${document.getElementById("groupme").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="groupme" alt="Edit Icon"></div>
+        <div class="review-input"><strong>Twitter:</strong> ${document.getElementById("twitter").value} <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-field="twitter" alt="Edit Icon"></div>`;
+      reviewContainer.appendChild(socialSection);
+      
+      const imagesSection = document.createElement("div");
+      imagesSection.className = "review-section";
+      imagesSection.innerHTML = `<h3>Image Previews</h3>`;
+      const logoPreviewImg = document.querySelector("#logoPreviewContainer img");
+      if (logoPreviewImg) {
+        const logoDiv = document.createElement("div");
+        logoDiv.className = "review-image-preview review-input";
+        logoDiv.innerHTML = `<h4>Logo:</h4> <img src="${logoPreviewImg.src}" alt="Logo Preview" style="width:80px; height:80px; object-fit:cover; border:1px solid #ccc; margin-left:8px;"> <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-type="logo" alt="Edit Icon">`;
+        imagesSection.appendChild(logoDiv);
+      }
+      const profilePreviewImg = document.querySelector("#profilePreviewContainer img");
+      if (profilePreviewImg) {
+        const profileDiv = document.createElement("div");
+        profileDiv.className = "review-image-preview review-input";
+        profileDiv.innerHTML = `<h4>Profile Picture:</h4> <img src="${profilePreviewImg.src}" alt="Profile Preview" style="width:80px; height:80px; object-fit:cover; border:1px solid #ccc; margin-left:8px;"> <img src="https://i.imgur.com/6SAvoQw.png" class="edit-icon" data-type="profile" alt="Edit Icon">`;
+        imagesSection.appendChild(profileDiv);
+      }
+      reviewContainer.appendChild(imagesSection);
+      
+      // Attach click listeners for text fields
+      const textEditIcons = reviewContainer.querySelectorAll(".edit-icon[data-field]");
+      textEditIcons.forEach(function(icon) {
+        icon.addEventListener("click", function(e) {
+          e.stopPropagation();
+          const field = this.getAttribute("data-field");
+          openEditModal(field);
+        });
+      });
+      // Attach click listeners for image edit icons
+      const imageEditIcons = reviewContainer.querySelectorAll(".edit-icon[data-type]");
+      imageEditIcons.forEach(function(icon) {
+        icon.addEventListener("click", function(e) {
+          e.stopPropagation();
+          const type = this.getAttribute("data-type");
+          triggerImageEdit(type);
+        });
+      });
+    }
+  
+    // Updated dropdown options with literal ampersands (no HTML entities)
+    const dropdownOptions = {
+      projectType: ["Organization", "Startup", "Small Business", "Research & Development"],
+      industry: ["STEM", "Education & Learning", "Games & Entertainment", "Environment & Sustainability", "Health & Wellness", "Arts", "Media"]
+    };
+  
+    document.getElementById("editModalSave").addEventListener("click", function() {
+      let newValue = "";
+      if (currentEditInputElement.tagName.toLowerCase() === "div" && currentEditField === "industryInput") {
+        const selectedButtons = currentEditInputElement.querySelectorAll("button.selected");
+        const values = Array.from(selectedButtons).map(btn => btn.textContent.trim());
+        newValue = values.join(", ");
+      } else if (currentEditInputElement.tagName.toLowerCase() === "div" && currentEditField === "projectTypeInput") {
+        const selectedButton = currentEditInputElement.querySelector("button.selected");
+        newValue = selectedButton ? selectedButton.textContent.trim() : "";
+      } else if (currentEditInputElement.tagName.toLowerCase() === "div") {
+        const radios = currentEditInputElement.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => { if (radio.checked) { newValue = radio.value; } });
+      } else {
+        newValue = currentEditInputElement.value;
+      }
+      const fieldElement = document.getElementById(currentEditField);
+      if (fieldElement) { fieldElement.value = newValue; }
+      closeEditModal();
+      populateReview();
+    });
+  
+    document.getElementById("editModalClose").addEventListener("click", closeEditModal);
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+    window.addEventListener("click", function(e) {
+      const editModal = document.getElementById("editModal");
+      if (e.target === editModal) { closeEditModal(); }
+    });
+  
+    const logoImageInput = document.getElementById("logoImage");
+    logoImageInput.addEventListener("change", function() {
+      if (this.files && this.files.length > 0) {
+        openModalWithFile(this.files[0], "logo");
+      }
+    });
+    const profilePictureInput = document.getElementById("profilePicture");
+    profilePictureInput.addEventListener("change", function() {
+      if (this.files && this.files.length > 0) {
+        openModalWithFile(this.files[0], "profile");
+      }
+    });
+  
+    function openModalWithFile(file, type) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById("cropImage").src = e.target.result;
+        currentImageType = type;
+        document.getElementById("modalButtons").style.display = "block";
+        document.getElementById("cropControls").style.display = "none";
+        document.getElementById("cropModal").classList.remove("hidden");
+      };
+      reader.readAsDataURL(file);
+    }
+  
+    document.getElementById("useOriginalBtn").addEventListener("click", function() {
+      if (currentImageType === "logo") {
+        updatePreview("logo", logoImageInput.files[0], document.getElementById("cropImage").src);
+      } else if (currentImageType === "profile") {
+        updatePreview("profile", profilePictureInput.files[0], document.getElementById("cropImage").src);
+      }
+      closeModal();
+    });
+    document.getElementById("openEditBtn").addEventListener("click", function() {
+      document.getElementById("modalButtons").style.display = "none";
+      document.getElementById("cropControls").style.display = "block";
+      if (currentCropper) { currentCropper.destroy(); }
+      currentCropper = new Cropper(document.getElementById("cropImage"), {
+        aspectRatio: NaN,
+        viewMode: 1
+      });
+    });
+  
+    document.getElementById("rotateLeftBtn").addEventListener("click", function() {
+      if (currentCropper) { currentCropper.rotate(-45); }
+    });
+    document.getElementById("rotateRightBtn").addEventListener("click", function() {
+      if (currentCropper) { currentCropper.rotate(45); }
+    });
+    document.getElementById("cropConfirmBtn").addEventListener("click", function() {
+      if (currentCropper) {
+        const canvas = currentCropper.getCroppedCanvas();
+        const croppedDataUrl = canvas.toDataURL();
+        if (currentImageType === "logo") {
+          croppedLogoData = croppedDataUrl;
+          updatePreview("logo", logoImageInput.files[0], croppedDataUrl);
+        } else if (currentImageType === "profile") {
+          croppedProfileData = croppedDataUrl;
+          updatePreview("profile", profilePictureInput.files[0], croppedDataUrl);
+        }
+        currentCropper.destroy();
+        currentCropper = null;
+        closeModal();
+      }
+    });
+    document.getElementById("cropCancelBtn").addEventListener("click", function() {
+      if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
+      document.getElementById("cropControls").style.display = "none";
+      document.getElementById("modalButtons").style.display = "block";
+    });
+  
+    function updatePreview(type, file, dataUrl) {
+      if (type === "logo") {
+        const container = document.getElementById("logoPreviewContainer");
+        container.innerHTML = "";
+        const img = document.createElement("img");
+        img.src = dataUrl;
+        img.className = "image-preview";
+        img.addEventListener("click", function() { openModalWithFile(file, "logo"); });
+        const span = document.createElement("span");
+        span.className = "file-name";
+        span.textContent = file.name;
+        span.addEventListener("click", function() { openModalWithFile(file, "logo"); });
+        container.appendChild(img);
+        container.appendChild(span);
+      } else if (type === "profile") {
+        const container = document.getElementById("profilePreviewContainer");
+        container.innerHTML = "";
+        const img = document.createElement("img");
+        img.src = dataUrl;
+        img.className = "image-preview";
+        img.addEventListener("click", function() { openModalWithFile(file, "profile"); });
+        const span = document.createElement("span");
+        span.className = "file-name";
+        span.textContent = file.name;
+        span.addEventListener("click", function() { openModalWithFile(file, "profile"); });
+        container.appendChild(img);
+        container.appendChild(span);
+      }
+    }
+  
+    function closeModal() {
+      if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
+      document.getElementById("cropModal").classList.add("hidden");
+    }
+  
+    function generateProjectID() {
+      const now = new Date();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const year = now.getFullYear();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      const pad = n => n < 10 ? '0' + n : n;
+      const formattedTimestamp = `${month}/${day}/${year} ${hours}:${pad(minutes)}:${pad(seconds)}`;
+      return "P-" + formattedTimestamp.replace(/[\/: ]/g, '');
+    }
+  
+    const submissionForm = document.getElementById("submissionForm");
+    const logoURLHidden = document.getElementById("logoURL");
+    async function finalizeSubmission() {
+      console.log("finalizeSubmission called");
+      document.getElementById("loadingOverlay").style.display = "flex";
+      if (croppedLogoData) {
+        try {
+          const croppedBase64 = croppedLogoData.split(',')[1];
+          const formData = new FormData();
+          formData.append('image', croppedBase64);
+          formData.append('type', 'base64');
+          const response = await fetch('https://api.imgur.com/3/image', {
+            method: 'POST',
+            credentials: 'omit',
+            headers: { Authorization: `Client-ID ${CLIENT_ID}` },
+            body: formData
+          });
+          const json = await response.json();
+          if (json.success) {
+            logoURLHidden.value = json.data.link;
+            console.log("Cropped logo uploaded, URL:", json.data.link);
+          } else {
+            alert(`Imgur upload error (cropped logo): ${json.data.error}`);
+            document.getElementById("loadingOverlay").style.display = "none";
+            return;
+          }
+        } catch (err) {
+          alert("Error uploading cropped logo image to Imgur: " + err.message);
+          document.getElementById("loadingOverlay").style.display = "none";
+          return;
+        }
+      } else if (logoImageInput.files.length > 0) {
+        try {
+          const base64Data = await fileToBase64(logoImageInput.files[0]);
+          const base64Only = base64Data.split(',')[1];
+          const formData = new FormData();
+          formData.append('image', base64Only);
+          formData.append('type', 'base64');
+          const response = await fetch('https://api.imgur.com/3/image', {
+            method: 'POST',
+            credentials: 'omit',
+            headers: { Authorization: `Client-ID ${CLIENT_ID}` },
+            body: formData
+          });
+          const json = await response.json();
+          if (json.success) {
+            logoURLHidden.value = json.data.link;
+            console.log("Logo Imgur upload successful, URL:", json.data.link);
+          } else {
+            alert(`Imgur upload error (logo): ${json.data.error}`);
+            document.getElementById("loadingOverlay").style.display = "none";
+            return;
+          }
+        } catch (err) {
+          alert("Error uploading logo image to Imgur: " + err.message);
+          document.getElementById("loadingOverlay").style.display = "none";
+          return;
+        }
+      }
+      if (croppedProfileData) {
+        try {
+          const croppedBase64Profile = croppedProfileData.split(',')[1];
+          const formDataProfile = new FormData();
+          formDataProfile.append('image', croppedBase64Profile);
+          formDataProfile.append('type', 'base64');
+          const responseProfile = await fetch('https://api.imgur.com/3/image', {
+            method: 'POST',
+            credentials: 'omit',
+            headers: { Authorization: `Client-ID ${CLIENT_ID}` },
+            body: formDataProfile
+          });
+          const jsonProfile = await responseProfile.json();
+          if (jsonProfile.success) {
+            document.getElementById("profilePictureURL").value = jsonProfile.data.link;
+            console.log("Cropped profile uploaded, URL:", jsonProfile.data.link);
+          } else {
+            alert(`Imgur upload error (cropped profile): ${jsonProfile.data.error}`);
+            document.getElementById("loadingOverlay").style.display = "none";
+            return;
+          }
+        } catch (err) {
+          alert("Error uploading cropped profile picture to Imgur: " + err.message);
+          document.getElementById("loadingOverlay").style.display = "none";
+          return;
+        }
+      } else if (profilePictureInput.files.length > 0) {
+        try {
+          const base64DataProfile = await fileToBase64(profilePictureInput.files[0]);
+          const base64OnlyProfile = base64DataProfile.split(',')[1];
+          const formDataProfile = new FormData();
+          formDataProfile.append('image', base64OnlyProfile);
+          formDataProfile.append('type', 'base64');
+          const responseProfile = await fetch('https://api.imgur.com/3/image', {
+            method: 'POST',
+            credentials: 'omit',
+            headers: { Authorization: `Client-ID ${CLIENT_ID}` },
+            body: formDataProfile
+          });
+          const jsonProfile = await responseProfile.json();
+          if (jsonProfile.success) {
+            document.getElementById("profilePictureURL").value = jsonProfile.data.link;
+            console.log("Profile picture Imgur upload successful, URL:", jsonProfile.data.link);
+          } else {
+            alert(`Imgur upload error (profile picture): ${jsonProfile.data.error}`);
+            document.getElementById("loadingOverlay").style.display = "none";
+            return;
+          }
+        } catch (err) {
+          alert("Error uploading profile picture to Imgur: " + err.message);
+          document.getElementById("loadingOverlay").style.display = "none";
+          return;
+        }
+      }
+      if (!document.getElementById("projectID").value) {
+        document.getElementById("projectID").value = generateProjectID();
+      }
+      console.log("Submitting form");
+      formSubmitted = true;
+      submissionForm.submit();
+    }
+  
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = err => reject(err);
+        reader.readAsDataURL(file);
+      });
+    }
+  
+    document.getElementById("hidden_iframe").onload = function() {
+      if (formSubmitted) { submissionSuccess(); }
+    };
+  
+    function submissionSuccess() {
+      document.getElementById("loadingOverlay").style.display = "none";
+      document.querySelector(".form-container").style.display = "none";
+      document.getElementById("successMessage").style.display = "block";
+    }
+  
+    /* --- New Feature: Preview Modal with Updated Social Icons, Click-to-Copy Email, and Smoother Assembling Animation --- */
+    function openPreviewModal() {
+      const title = document.getElementById("projectTitle").value;
+      const tagline = document.getElementById("tagline").value;
+      const description = document.getElementById("description").value;
+      const demoLink = document.getElementById("demoLink").value;
+      const cta = document.getElementById("cta").value;
+      const visitText = cta.trim() !== "" ? cta : "Visit";
+      let logoSrc = "https://images.vexels.com/media/users/3/137617/isolated/preview/c45afb857e72b86e87baaf255f71ff37-geometric-logo-abstract-by-vexels.png";
+      const logoPreviewImg = document.querySelector("#logoPreviewContainer img");
+      if (logoPreviewImg) { logoSrc = logoPreviewImg.src; }
+      const industry = document.getElementById("industryInput").value;
+      const participants = document.getElementById("numParticipants").value;
+      const contactEmail = document.getElementById("123-ProjectContactEmail").value;
+      const school = document.getElementById("college").value;
+  
+      const headerHTML = `
+        <div class="title-container assemble-item">
+          <img src="${logoSrc}" alt="Project Logo" class="project-logo">
+          <h3>${title}</h3>
+        </div>
+        <div class="assemble-item">
+          ${demoLink.trim() !== ""
+            ? `<button class="visit-button" onclick="window.open('${demoLink}', '_blank')">${visitText}</button>`
+            : `<button class="visit-button">${visitText}</button>`}
+        </div>
+      `;
+      document.getElementById("previewModalHeader").innerHTML = headerHTML;
+  
+      const descriptionHTML = `<p class="assemble-item" id="previewModalDescription">${tagline} — ${description}</p>`;
+      document.getElementById("previewModalDescription").innerHTML = "";
+      document.getElementById("previewModalDescription").insertAdjacentHTML('afterbegin', descriptionHTML);
+  
+      let infoHTML = `
+        <div class="assemble-item project-school">
+          <img class="icon" src="https://i.imgur.com/EkoIEZj.png" alt="School Icon.png"> ${school}
+        </div>
+        <div class="assemble-item project-participants">
+          <img class="icon" src="https://i.imgur.com/Yxqk42o.png" alt="Participants Icon.png"> ${participants}
+        </div>
+        <div class="assemble-item project-contact" style="position: relative;">
+          <img class="contact-icon" src="https://i.imgur.com/va70cTC.png" alt="Email Icon.png" style="width:20px; height:20px; margin-right:5px; filter: grayscale(100%) brightness(0.6);">
+          <button class="view-email-btn">View Email Address</button>
+          <span class="email-address" data-email="${contactEmail}" style="display:none; cursor:pointer; position: relative;">
+            ${contactEmail}
+            <span class="copy-tooltip">Click to copy</span>
+          </span>
+        </div>
+      `;
+      const tagsArr = industry.split(",").map(s => s.trim()).filter(Boolean);
+      if (tagsArr.length > 0) {
+        infoHTML += `<div class="assemble-item tags">`;
+        tagsArr.forEach(tag => { infoHTML += `<span class="tag">${tag}</span>`; });
+        infoHTML += `</div>`;
+      }
+      document.getElementById("previewModalProjectInfo").innerHTML = infoHTML;
+  
+      let socialHTML = "";
+      if (document.getElementById("instagram").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/nqwRnQE.png); mask-image: url(https://i.imgur.com/nqwRnQE.png);" onclick="window.open('${document.getElementById("instagram").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("linkedin").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/Gy8GfvE.png); mask-image: url(https://i.imgur.com/Gy8GfvE.png);" onclick="window.open('${document.getElementById("linkedin").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("youtube").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/0N1oxHH.png); mask-image: url(https://i.imgur.com/0N1oxHH.png);" onclick="window.open('${document.getElementById("youtube").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("tiktok").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/F1J2FqH.png); mask-image: url(https://i.imgur.com/F1J2FqH.png);" onclick="window.open('${document.getElementById("tiktok").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("github").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/65TtGM5.png); mask-image: url(https://i.imgur.com/65TtGM5.png);" onclick="window.open('${document.getElementById("github").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("website").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/eoUtzpJ.png); mask-image: url(https://i.imgur.com/eoUtzpJ.png);" onclick="window.open('${document.getElementById("website").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("linktree").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/yr2y17y.png); mask-image: url(https://i.imgur.com/yr2y17y.png);" onclick="window.open('${document.getElementById("linktree").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("disc").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/awUgfp5.png); mask-image: url(https://i.imgur.com/awUgfp5.png);" onclick="window.open('${document.getElementById("disc").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("groupme").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/V7axoql.png); mask-image: url(https://i.imgur.com/V7axoql.png);" onclick="window.open('${document.getElementById("groupme").value}', '_blank')"></div>`;
+      }
+      if (document.getElementById("twitter") && document.getElementById("twitter").value.trim() !== "") {
+        socialHTML += `<div class="social-icon assemble-item" style="-webkit-mask-image: url(https://i.imgur.com/uOSAeMX.png); mask-image: url(https://i.imgur.com/uOSAeMX.png);" onclick="window.open('${document.getElementById("twitter").value}', '_blank')"></div>`;
+      }
+      document.getElementById("previewModalSocialLinks").innerHTML = socialHTML;
+  
+      const viewEmailBtn = document.querySelector("#previewModal .view-email-btn");
+      const emailSpan = document.querySelector("#previewModal .email-address");
+      if (viewEmailBtn && emailSpan) {
+        viewEmailBtn.addEventListener("click", function(e) {
+          e.stopPropagation();
+          openCaptchaModal();
+          viewEmailBtn.style.display = "none";
+        });
+        emailSpan.addEventListener("click", function(e) {
+          e.stopPropagation();
+          const emailText = emailSpan.dataset.email;
+          navigator.clipboard.writeText(emailText).then(() => {
+            const tooltip = emailSpan.querySelector(".copy-tooltip");
+            tooltip.textContent = "Copied!";
+            setTimeout(() => { tooltip.textContent = "Click to copy"; }, 2000);
+          });
+        });
+      }
+  
+      const items = document.querySelectorAll("#previewModal .modal-content > :not(.close)");
+      items.forEach(item => {
+        item.classList.remove("assemble-item");
+        void item.offsetWidth;
+        item.classList.add("assemble-item");
+      });
+  
+      document.getElementById("previewModal").style.display = "block";
+    }
+  
+    document.getElementById("previewModalClose").addEventListener("click", function() {
+      document.getElementById("previewModal").style.display = "none";
+    });
+    window.addEventListener("click", function(e) {
+      if (e.target === document.getElementById("previewModal")) {
+        document.getElementById("previewModal").style.display = "none";
+      }
+    });
+  
+    /* --- Captcha Modal for Email Verification --- */
+    function openCaptchaModal() {
+      const captchaModal = document.getElementById("captchaModal");
+      const captchaConfirmBtn = document.getElementById("captchaConfirmBtn");
+      captchaModal.style.display = "block";
+      captchaConfirmBtn.textContent = "Verifying...";
+      captchaConfirmBtn.disabled = true;
+      setTimeout(() => {
+        captchaModal.style.display = "none";
+        captchaConfirmBtn.disabled = false;
+        const emailSpan = document.querySelector("#previewModal .email-address");
+        if (emailSpan) { emailSpan.style.display = "inline"; }
+      }, 2000);
+    }
+  
+    document.getElementById("captchaClose").addEventListener("click", function() {
+      document.getElementById("captchaModal").style.display = "none";
+    });
+    window.addEventListener("click", function(e) {
+      const captchaModal = document.getElementById("captchaModal");
+      if (e.target === captchaModal) { captchaModal.style.display = "none"; }
+    });
+  
+    /* --- End New Feature: Preview Modal --- */
+    function toggleCustomAction(show) {
+      const container = document.getElementById("customActionFields");
+      if (show) { container.classList.remove("hidden"); }
+      else { container.classList.add("hidden"); }
+    }
+    function selectCustomActionChoice(choice, button) {
+      const container = button.parentElement;
+      const buttons = container.getElementsByTagName("button");
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove("selected");
+      }
+      button.classList.add("selected");
+      toggleCustomAction(choice);
+    }
+  </script>
+</body>
+</html>
